@@ -78,6 +78,10 @@ final class DownloadManager: NSObject, ObservableObject {
       return
     }
 
+    if downloadStates[bookID] == .downloaded {
+      return
+    }
+
     AppLogger.download.info("Starting \(type) download for book: \(bookID)")
     let operation = DownloadOperation(bookID: bookID, type: type)
     activeOperations[bookID] = operation

@@ -74,7 +74,7 @@ extension Book {
     } else if duration > 0 {
       types.insert(.audiobook)
     }
-    if media.ebookFile != nil {
+    if media.ebookFile != nil || media.ebookFormat != nil {
       types.insert(.ebook)
     }
     return types
