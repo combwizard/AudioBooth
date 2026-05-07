@@ -8,10 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Haptic feedback - Add haptic feedback throughout the app for improved tactile interaction
+- Watch app custom header - Add custom header to the watch app for a more refined look
+- Book subtitle preference - Add preference to display book subtitles in the library
 - Ebook reader auto theme - Add auto mode to ebook reader theme that follows system appearance
 - Watch app sections - Add more sections on the watch app for quicker access to your library
 - CarPlay library selection - Choose which library to browse directly from CarPlay
 - Playlist and collection downloads - Download all support for playlists and collections in a single action
+
+### Changed
+- Smart rewind pause threshold - Pause threshold is now dynamic for more accurate smart rewind behavior
+- Alternate URL verification - Improved alternate URL verification for more reliable fallback
+- Auth token refresh - Improved authentication token refresh to better handle rate limits
 
 ### Fixed
 - Offline page filter - Fixed filter behavior on the offline page
