@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Playlist and collection downloads - Download all support for playlists and collections in a single action
 
 ### Changed
+- Preferences revamp - Revamped preferences with an adjusted page color palette for a refreshed look
 - Smart rewind pause threshold - Pause threshold is now dynamic for more accurate smart rewind behavior
 - Alternate URL verification - Improved alternate URL verification for more reliable fallback
 - Auth token refresh - Improved authentication token refresh to better handle rate limits
