@@ -87,7 +87,7 @@ final class StorageManager {
 
         let bookDescriptor = FetchDescriptor<LocalBook>()
         let allBooks = try context.fetch(bookDescriptor)
-        let downloadedBooks = allBooks.filter { $0.isDownloaded }
+        let downloadedBooks = allBooks.filter { $0.isDownloaded || $0.ebookFile != nil }
 
         for book in downloadedBooks {
           if book.bookID == currentlyPlaying { continue }

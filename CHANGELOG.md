@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Playlist and collection downloads - Download all support for playlists and collections in a single action
 
 ### Changed
+- Book downloads - Audiobook and ebook are now fetched together in a single download action, with accurate state and progress reflecting what's on disk
 - Preferences revamp - Revamped preferences with an adjusted page color palette for a refreshed look
 - Smart rewind pause threshold - Pause threshold is now dynamic for more accurate smart rewind behavior
 - Alternate URL verification - Improved alternate URL verification for more reliable fallback

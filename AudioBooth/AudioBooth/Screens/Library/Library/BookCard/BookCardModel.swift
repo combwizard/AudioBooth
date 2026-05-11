@@ -22,8 +22,11 @@ final class BookCardModel: BookCard.Model {
 
     self.item = .local(item)
 
+    let hasLocalAudio = !item.tracks.isEmpty && item.tracks.allSatisfy { $0.relativePath != nil }
+    let hasLocalEbook = item.ebookFile != nil
+
     var details: String
-    if item.tracks.isEmpty && item.ebookFile != nil {
+    if !hasLocalAudio && hasLocalEbook {
       details = "Ebook"
       if let ebookPath = item.ebookLocalPath,
         let fileSize = try? FileManager.default.attributesOfItem(atPath: ebookPath.path)[.size] as? Int64,

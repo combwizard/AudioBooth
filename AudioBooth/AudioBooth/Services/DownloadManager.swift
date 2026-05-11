@@ -10,8 +10,36 @@ import SwiftData
 final class DownloadManager: NSObject, ObservableObject {
   static let shared = DownloadManager()
 
-  enum DownloadType {
-    case audiobook
+  static let appGroupIdentifier = "group.me.jgrenier.audioBS"
+
+  static let appGroupContainer: URL = {
+    guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) else {
+      fatalError("App group container '\(appGroupIdentifier)' not configured")
+    }
+    return url
+  }()
+
+  static func serverDirectory(serverID: String) -> URL {
+    appGroupContainer.appendingPathComponent(serverID)
+  }
+
+  static func audiobookDirectory(serverID: String, bookID: String) -> URL {
+    serverDirectory(serverID: serverID).appendingPathComponent("audiobooks").appendingPathComponent(bookID)
+  }
+
+  static func ebookDirectory(serverID: String, bookID: String) -> URL {
+    serverDirectory(serverID: serverID).appendingPathComponent("ebooks").appendingPathComponent(bookID)
+  }
+
+  static func episodeDirectory(serverID: String, podcastID: String, episodeID: String) -> URL {
+    serverDirectory(serverID: serverID)
+      .appendingPathComponent("episodes")
+      .appendingPathComponent(podcastID)
+      .appendingPathComponent(episodeID)
+  }
+
+  enum DownloadType: Equatable {
+    case book
     case ebook
     case episode(podcastID: String, episodeID: String)
   }
@@ -71,7 +99,7 @@ final class DownloadManager: NSObject, ObservableObject {
 
   func startDownload(
     for bookID: String,
-    type: DownloadType = .audiobook,
+    type: DownloadType = .book,
     info: DownloadInfo? = nil,
   ) {
     guard activeOperations[bookID] == nil else {
@@ -110,7 +138,7 @@ final class DownloadManager: NSObject, ObservableObject {
 
         if operation.isFinished && !operation.isCancelled {
           AppLogger.download.info("Download completed successfully for book: \(bookID)")
-          self?.downloadStates[bookID] = .downloaded
+          self?.downloadStates[bookID] = operation.resultIsFullyDownloaded ? .downloaded : .notDownloaded
         } else {
           AppLogger.download.info("Download cancelled or failed for book: \(bookID)")
           self?.downloadStates[bookID] = .notDownloaded
@@ -135,23 +163,14 @@ final class DownloadManager: NSObject, ObservableObject {
 extension DownloadManager {
   func deleteDownload(for bookID: String) {
     Task {
-      guard
-        let appGroupURL = FileManager.default.containerURL(
-          forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-        ),
-        let serverID = Audiobookshelf.shared.authentication.server?.id
-      else {
-        AppLogger.download.error("Failed to access app group container for deletion")
+      guard let serverID = Audiobookshelf.shared.authentication.server?.id else {
+        AppLogger.download.error("No active server for deletion")
         Toast(error: "Failed to access app group container").show()
         return
       }
 
-      let serverDirectory = appGroupURL.appendingPathComponent(serverID)
-      let audiobookDirectory = serverDirectory.appendingPathComponent("audiobooks").appendingPathComponent(bookID)
-      let ebookDirectory = serverDirectory.appendingPathComponent("ebooks").appendingPathComponent(bookID)
-
-      try? FileManager.default.removeItem(at: audiobookDirectory)
-      try? FileManager.default.removeItem(at: ebookDirectory)
+      try? FileManager.default.removeItem(at: Self.audiobookDirectory(serverID: serverID, bookID: bookID))
+      try? FileManager.default.removeItem(at: Self.ebookDirectory(serverID: serverID, bookID: bookID))
 
       if let item = try? LocalBook.fetch(bookID: bookID) {
         try? item.delete()
@@ -167,25 +186,15 @@ extension DownloadManager {
 
   func deleteEpisodeDownload(episodeID: String, podcastID: String) {
     Task {
-      guard
-        let appGroupURL = FileManager.default.containerURL(
-          forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-        ),
-        let serverID = Audiobookshelf.shared.authentication.server?.id
-      else {
-        AppLogger.download.error("Failed to access app group container for deletion")
+      guard let serverID = Audiobookshelf.shared.authentication.server?.id else {
+        AppLogger.download.error("No active server for deletion")
         Toast(error: "Failed to access app group container").show()
         return
       }
 
-      let serverDirectory = appGroupURL.appendingPathComponent(serverID)
-      let episodeDirectory =
-        serverDirectory
-        .appendingPathComponent("episodes")
-        .appendingPathComponent(podcastID)
-        .appendingPathComponent(episodeID)
-
-      try? FileManager.default.removeItem(at: episodeDirectory)
+      try? FileManager.default.removeItem(
+        at: Self.episodeDirectory(serverID: serverID, podcastID: podcastID, episodeID: episodeID)
+      )
 
       if let episode = try? LocalEpisode.fetch(episodeID: episodeID) {
         try? episode.delete()
@@ -213,17 +222,9 @@ extension DownloadManager {
 
   func deleteAllServerData() {
     Task {
-      guard
-        let appGroupURL = FileManager.default.containerURL(
-          forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-        )
-      else {
-        return
-      }
-
       do {
         let directories = try FileManager.default.contentsOfDirectory(
-          at: appGroupURL,
+          at: Self.appGroupContainer,
           includingPropertiesForKeys: [.isDirectoryKey]
         )
 
@@ -251,11 +252,13 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
 
   let bookID: String
   let type: DownloadManager.DownloadType
+  private(set) var resultIsFullyDownloaded: Bool = false
+  private var ebookStepCompleted = false
+  private var audioStepCompleted = false
   let progress: AsyncStream<Double>
 
   private let progressContinuation: AsyncStream<Double>.Continuation
 
-  private var apiBook: Book?
   private var totalBytes: Int64 = 0
   private var bytesDownloadedSoFar: Int64 = 0
 
@@ -338,39 +341,32 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
   }
 
   private func cleanupPartialDownload() async {
-    guard
-      let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-      ),
-      let serverID = Audiobookshelf.shared.authentication.server?.id
-    else {
-      return
-    }
+    guard let serverID = Audiobookshelf.shared.authentication.server?.id else { return }
 
-    let bookDirectory: URL
     switch type {
-    case .audiobook:
-      bookDirectory = appGroupURL.appendingPathComponent(serverID)
-        .appendingPathComponent("audiobooks").appendingPathComponent(bookID)
+    case .book:
+      if !audioStepCompleted {
+        try? FileManager.default.removeItem(at: DownloadManager.audiobookDirectory(serverID: serverID, bookID: bookID))
+      }
+      if !ebookStepCompleted {
+        try? FileManager.default.removeItem(at: DownloadManager.ebookDirectory(serverID: serverID, bookID: bookID))
+      }
     case .ebook:
-      bookDirectory = appGroupURL.appendingPathComponent(serverID)
-        .appendingPathComponent("ebooks").appendingPathComponent(bookID)
+      if !ebookStepCompleted {
+        try? FileManager.default.removeItem(at: DownloadManager.ebookDirectory(serverID: serverID, bookID: bookID))
+      }
     case .episode(let podcastID, let episodeID):
-      bookDirectory = appGroupURL.appendingPathComponent(serverID)
-        .appendingPathComponent("episodes").appendingPathComponent(podcastID)
-        .appendingPathComponent(episodeID)
+      try? FileManager.default.removeItem(
+        at: DownloadManager.episodeDirectory(serverID: serverID, podcastID: podcastID, episodeID: episodeID)
+      )
     }
-
-    try? FileManager.default.removeItem(at: bookDirectory)
   }
 
   private func executeDownload() async {
     do {
       switch type {
-      case .audiobook:
-        try await executeAudiobookDownload()
-      case .ebook:
-        try await executeEbookDownload()
+      case .book, .ebook:
+        try await executeBookDownload()
       case .episode(let podcastID, let episodeID):
         try await executeEpisodeDownload(podcastID: podcastID, episodeID: episodeID)
       }
@@ -381,28 +377,67 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
     }
   }
 
-  private func executeAudiobookDownload() async throws {
+  private func executeBookDownload() async throws {
     let book = try await audiobookshelf.books.fetch(id: bookID)
 
-    guard !isCancelled else {
-      throw CancellationError()
+    let serverHasAudio = book.mediaType.contains(.audiobook) && !(book.tracks ?? []).isEmpty
+    let serverHasEbook = book.mediaType.contains(.ebook)
+
+    let wantsAudio = type == .book && serverHasAudio
+    let wantsEbook = (type == .book || type == .ebook) && serverHasEbook
+
+    guard wantsAudio || wantsEbook else {
+      AppLogger.download.error("Nothing to download for book \(bookID)")
+      throw URLError(.badURL)
     }
 
-    self.apiBook = book
-    self.totalBytes = (book.tracks ?? []).reduce(0) { $0 + ($1.metadata?.size ?? 0) }
-    let trackCount = book.tracks?.count ?? 0
-    AppLogger.download.info("Downloading audiobook: \(trackCount) tracks, \(totalBytes.formattedByteSize)")
+    totalBytes = 0
+    if wantsAudio {
+      totalBytes += (book.tracks ?? []).reduce(0) { $0 + ($1.metadata?.size ?? 0) }
+    }
+    if wantsEbook, let ebookSize = book.media.ebookFile?.metadata.size {
+      totalBytes += ebookSize
+    }
 
-    let tracks = try await downloadTracks()
+    if wantsEbook {
+      guard !isCancelled else { throw CancellationError() }
+      try await downloadEbookStep(book: book)
+    }
+
+    if wantsAudio {
+      guard !isCancelled else { throw CancellationError() }
+      try await downloadAudiobookStep(book: book)
+    }
+
+    switch type {
+    case .book:
+      resultIsFullyDownloaded = true
+    case .ebook:
+      resultIsFullyDownloaded = !serverHasAudio
+    case .episode:
+      break
+    }
+
+    if resultIsFullyDownloaded {
+      progressContinuation.yield(1.0)
+    }
+  }
+
+  private func downloadAudiobookStep(book: Book) async throws {
+    let trackCount = book.tracks?.count ?? 0
+    let stepBytes = (book.tracks ?? []).reduce(0) { $0 + ($1.metadata?.size ?? 0) }
+    AppLogger.download.info("Downloading audiobook: \(trackCount) tracks, \(stepBytes.formattedByteSize)")
+
+    let tracks = try await downloadTracks(book: book)
 
     let localBook = LocalBook(from: book)
     localBook.tracks = tracks
     try? localBook.save()
+
+    audioStepCompleted = true
   }
 
-  private func executeEbookDownload() async throws {
-    let book = try await audiobookshelf.books.fetch(id: bookID)
-
+  private func downloadEbookStep(book: Book) async throws {
     guard let ebookURL = book.ebookURL else {
       AppLogger.download.error("No ebook URL found for book: \(bookID)")
       throw URLError(.badURL)
@@ -417,7 +452,8 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
     }
 
     AppLogger.download.info("Downloading ebook: \(ext)")
-    try await downloadEbook(from: ebookURL, ext: ext)
+    let ebookExpectedSize = book.media.ebookFile?.metadata.size ?? 50_000_000
+    let ebookFile = try await downloadEbook(from: ebookURL, ext: ext, expectedSize: ebookExpectedSize)
 
     guard let serverID = Audiobookshelf.shared.authentication.server?.id else {
       throw URLError(.userAuthenticationRequired)
@@ -426,14 +462,14 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
     let localBook = LocalBook(from: book)
     localBook.ebookFile = URL(string: "\(serverID)/ebooks/\(bookID)/\(bookID)\(ext)")
     try? localBook.save()
+    ebookStepCompleted = true
+
+    bytesDownloadedSoFar += diskSize(of: ebookFile)
   }
 
   private func executeEpisodeDownload(podcastID: String, episodeID: String) async throws {
     let podcast = try await audiobookshelf.podcasts.fetch(id: podcastID)
-
-    guard !isCancelled else {
-      throw CancellationError()
-    }
+    guard !isCancelled else { throw CancellationError() }
 
     guard let apiEpisode = podcast.media.episodes?.first(where: { $0.id == episodeID }) else {
       AppLogger.download.error("Episode not found: \(episodeID)")
@@ -447,62 +483,25 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
 
     let fileSize = audioTrack.metadata?.size ?? apiEpisode.size ?? 0
     self.totalBytes = fileSize
-
     AppLogger.download.info("Downloading episode: \(apiEpisode.title), \(fileSize.formattedByteSize)")
 
-    guard
-      let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-      )
-    else {
-      throw URLError(.fileDoesNotExist)
-    }
-
-    guard
-      let serverID = Audiobookshelf.shared.authentication.server?.id,
-      let serverURL = Audiobookshelf.shared.authentication.serverURL,
-      let credentials = try? await Audiobookshelf.shared.authentication.server?.freshToken
-    else {
-      throw URLError(.userAuthenticationRequired)
-    }
-
-    let serverDirectory = appGroupURL.appendingPathComponent(serverID)
-    var episodesDirectory = serverDirectory.appendingPathComponent("episodes")
-    let episodeDirectory =
-      episodesDirectory
-      .appendingPathComponent(podcastID)
-      .appendingPathComponent(episodeID)
-
-    if FileManager.default.fileExists(atPath: episodeDirectory.path) {
-      try? FileManager.default.removeItem(at: episodeDirectory)
-    }
-
-    try FileManager.default.createDirectory(at: episodeDirectory, withIntermediateDirectories: true)
-
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    try? episodesDirectory.setResourceValues(resourceValues)
+    let context = try await currentServerContext()
+    let episodeDirectory = DownloadManager.episodeDirectory(
+      serverID: context.serverID,
+      podcastID: podcastID,
+      episodeID: episodeID
+    )
+    try prepareDownloadDirectory(episodeDirectory)
 
     let ext = audioTrack.sanitizedExt
-    let trackURL = serverURL.appendingPathComponent("api/items/\(podcastID)/file/\(ino)/download")
+    let trackURL = context.serverURL.appendingPathComponent("api/items/\(podcastID)/file/\(ino)/download")
     let trackFile = episodeDirectory.appendingPathComponent("0\(ext)")
 
-    var request = URLRequest(url: trackURL)
-    request.setValue(credentials.bearer, forHTTPHeaderField: "Authorization")
-
-    if let customHeaders = Audiobookshelf.shared.authentication.server?.customHeaders {
-      for (key, value) in customHeaders {
-        request.setValue(value, forHTTPHeaderField: key)
-      }
-    }
-
     try await downloadFile(
-      request: request,
+      request: authorizedRequest(url: trackURL, credentials: context.credentials),
       expectedSize: fileSize,
       destination: trackFile
     )
-
-    progressContinuation.yield(1.0)
 
     let localPodcast: LocalPodcast
     if let existing = try? LocalPodcast.fetch(podcastID: podcastID) {
@@ -537,148 +536,115 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
         filename: audioTrack.metadata?.filename,
         ext: ext,
         size: fileSize,
-        relativePath: URL(string: "\(serverID)/episodes/\(podcastID)/\(episodeID)/0\(ext)")
+        relativePath: URL(string: "\(context.serverID)/episodes/\(podcastID)/\(episodeID)/0\(ext)")
       ),
       chapters: (apiEpisode.chapters ?? []).map {
         Chapter(id: $0.id, start: $0.start, end: $0.end, title: $0.title)
       }
     )
     try? localEpisode.save()
+
+    resultIsFullyDownloaded = true
+    progressContinuation.yield(1.0)
   }
 
-  private func downloadTracks() async throws -> [Track] {
-    guard let apiBook else { throw URLError(.unknown) }
-
-    let apiTracks = apiBook.tracks ?? []
+  private func downloadTracks(book: Book) async throws -> [Track] {
+    let apiTracks = book.tracks ?? []
     guard !apiTracks.isEmpty else {
       AppLogger.download.error("No tracks found for audiobook: \(bookID)")
       throw URLError(.badURL)
     }
 
-    guard
-      let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-      )
-    else {
-      AppLogger.download.error("Failed to access app group container")
-      throw URLError(.fileDoesNotExist)
-    }
-
-    guard
-      let serverID = Audiobookshelf.shared.authentication.server?.id,
-      let serverURL = Audiobookshelf.shared.authentication.serverURL,
-      let credentials = try? await Audiobookshelf.shared.authentication.server?.freshToken
-    else {
-      AppLogger.download.error("Missing authentication credentials")
-      throw URLError(.userAuthenticationRequired)
-    }
-
-    let serverDirectory = appGroupURL.appendingPathComponent(serverID)
-    var audiobooksDirectory = serverDirectory.appendingPathComponent("audiobooks")
-    let bookDirectory = audiobooksDirectory.appendingPathComponent(bookID)
-
-    if FileManager.default.fileExists(atPath: bookDirectory.path) {
-      try? FileManager.default.removeItem(at: bookDirectory)
-    }
-
-    try FileManager.default.createDirectory(at: bookDirectory, withIntermediateDirectories: true)
-
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    try? audiobooksDirectory.setResourceValues(resourceValues)
+    let context = try await currentServerContext()
+    let bookDirectory = DownloadManager.audiobookDirectory(serverID: context.serverID, bookID: bookID)
+    try prepareDownloadDirectory(bookDirectory)
 
     var tracks: [Track] = []
 
     for apiTrack in apiTracks {
       guard !isCancelled else { throw CancellationError() }
-
       guard let ino = apiTrack.ino else { continue }
 
       let ext = apiTrack.sanitizedExt
-      let trackURL = serverURL.appendingPathComponent("api/items/\(bookID)/file/\(ino)/download")
-
+      let trackURL = context.serverURL.appendingPathComponent("api/items/\(bookID)/file/\(ino)/download")
       let trackFile = bookDirectory.appendingPathComponent("\(apiTrack.index)\(ext)")
 
-      var request = URLRequest(url: trackURL)
-
-      request.setValue(credentials.bearer, forHTTPHeaderField: "Authorization")
-
-      if let customHeaders = Audiobookshelf.shared.authentication.server?.customHeaders {
-        for (key, value) in customHeaders {
-          request.setValue(value, forHTTPHeaderField: key)
-        }
-      }
-
       try await downloadFile(
-        request: request,
+        request: authorizedRequest(url: trackURL, credentials: context.credentials),
         expectedSize: apiTrack.metadata?.size ?? 500_000_000,
         destination: trackFile
       )
 
-      if let size = apiTrack.metadata?.size {
-        bytesDownloadedSoFar += size
-      }
+      bytesDownloadedSoFar += diskSize(of: trackFile)
 
-      let relativePath = URL(string: "\(serverID)/audiobooks/\(bookID)/\(apiTrack.index)\(ext)")
       let track = Track(from: apiTrack)
-      track.relativePath = relativePath
+      track.relativePath = URL(string: "\(context.serverID)/audiobooks/\(bookID)/\(apiTrack.index)\(ext)")
       tracks.append(track)
     }
 
     return tracks
   }
 
-  private func downloadEbook(from ebookURL: URL, ext: String) async throws {
-    guard
-      let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
-      )
-    else {
-      AppLogger.download.error("Failed to access app group container")
-      throw URLError(.fileDoesNotExist)
-    }
-
-    guard
-      let serverID = Audiobookshelf.shared.authentication.server?.id,
-      let credentials = try? await Audiobookshelf.shared.authentication.server?.freshToken
-    else {
-      AppLogger.download.error("Missing server ID for authentication")
-      throw URLError(.userAuthenticationRequired)
-    }
-
-    let serverDirectory = appGroupURL.appendingPathComponent(serverID)
-    var ebooksDirectory = serverDirectory.appendingPathComponent("ebooks")
-    let bookDirectory = ebooksDirectory.appendingPathComponent(bookID)
-
-    if FileManager.default.fileExists(atPath: bookDirectory.path) {
-      try? FileManager.default.removeItem(at: bookDirectory)
-    }
-
-    try FileManager.default.createDirectory(at: bookDirectory, withIntermediateDirectories: true)
-
-    var resourceValues = URLResourceValues()
-    resourceValues.isExcludedFromBackup = true
-    try? ebooksDirectory.setResourceValues(resourceValues)
+  private func downloadEbook(from ebookURL: URL, ext: String, expectedSize: Int64) async throws -> URL {
+    let context = try await currentServerContext()
+    let bookDirectory = DownloadManager.ebookDirectory(serverID: context.serverID, bookID: bookID)
+    try prepareDownloadDirectory(bookDirectory)
 
     let ebookFile = bookDirectory.appendingPathComponent("\(bookID)\(ext)")
 
-    var request = URLRequest(url: ebookURL)
+    try await downloadFile(
+      request: authorizedRequest(url: ebookURL, credentials: context.credentials),
+      expectedSize: expectedSize,
+      destination: ebookFile
+    )
 
+    return ebookFile
+  }
+
+  private func diskSize(of url: URL) -> Int64 {
+    let attrs = try? FileManager.default.attributesOfItem(atPath: url.path)
+    return (attrs?[.size] as? Int64) ?? 0
+  }
+
+  private struct ServerContext {
+    let serverID: String
+    let serverURL: URL
+    let credentials: Credentials
+  }
+
+  private func currentServerContext() async throws -> ServerContext {
+    guard
+      let server = Audiobookshelf.shared.authentication.server,
+      let serverURL = Audiobookshelf.shared.authentication.serverURL,
+      let credentials = try? await server.freshToken
+    else {
+      AppLogger.download.error("Missing authentication credentials")
+      throw URLError(.userAuthenticationRequired)
+    }
+    return ServerContext(serverID: server.id, serverURL: serverURL, credentials: credentials)
+  }
+
+  private func prepareDownloadDirectory(_ url: URL) throws {
+    if FileManager.default.fileExists(atPath: url.path) {
+      try? FileManager.default.removeItem(at: url)
+    }
+    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+
+    var parent = url.deletingLastPathComponent()
+    var values = URLResourceValues()
+    values.isExcludedFromBackup = true
+    try? parent.setResourceValues(values)
+  }
+
+  private func authorizedRequest(url: URL, credentials: Credentials) -> URLRequest {
+    var request = URLRequest(url: url)
     request.setValue(credentials.bearer, forHTTPHeaderField: "Authorization")
-
     if let customHeaders = Audiobookshelf.shared.authentication.server?.customHeaders {
       for (key, value) in customHeaders {
         request.setValue(value, forHTTPHeaderField: key)
       }
     }
-
-    try await downloadFile(
-      request: request,
-      expectedSize: 50_000_000,
-      destination: ebookFile
-    )
-
-    progressContinuation.yield(1.0)
+    return request
   }
 
   private func downloadFile(
@@ -765,7 +731,7 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
     guard totalBytes > 0 else { return }
     let totalBytesDownloaded = bytesDownloadedSoFar + totalBytesWritten
     let newProgress = Double(totalBytesDownloaded) / Double(totalBytes)
-    progressContinuation.yield(newProgress)
+    progressContinuation.yield(min(newProgress, 1.0))
   }
 
   private func trackDownloadCompleted(location: URL) throws {

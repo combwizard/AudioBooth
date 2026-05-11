@@ -184,7 +184,7 @@ final class StoragePreferencesViewModel: StoragePreferencesView.Model {
       let descriptor = FetchDescriptor<LocalBook>()
       guard let books = try? context.fetch(descriptor) else { continue }
 
-      let downloadedBooks = books.filter { $0.isDownloaded }
+      let downloadedBooks = books.filter { $0.isDownloaded || $0.ebookFile != nil }
       guard !downloadedBooks.isEmpty else { continue }
 
       let bookRows: [StoragePreferencesView.DownloadedBook] = downloadedBooks.map { book in
