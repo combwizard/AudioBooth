@@ -37,7 +37,7 @@ public final class AuthenticationService: ObservableObject {
     }
   }
 
-  public var serverURL: URL? { server?.baseURL }
+  public var serverURL: URL? { server?.activeURL }
   public var isAuthenticated: Bool { server != nil }
 
   public var permissions: User.Permissions? {

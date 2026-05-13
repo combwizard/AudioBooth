@@ -177,8 +177,9 @@ final class NetworkService {
   private func performRequest<T: Decodable>(_ request: NetworkRequest<T>) async throws -> NetworkResponse<T> {
     let urlRequest = try await buildURLRequest(from: request)
 
+    let redactedHost = server?.isUsingAlternativeURL == true ? "abs.alternative" : "abs.primary"
     AppLogger.network.info(
-      "Sending \(urlRequest.httpMethod ?? "GET") request to: \(urlRequest.url?.redactedString ?? "unknown")"
+      "Sending \(urlRequest.httpMethod ?? "GET") request to: \(urlRequest.url?.redactedString(host: redactedHost) ?? "unknown")"
     )
 
     let selectedSession = request.discretionary ? discretionarySession : session
@@ -319,8 +320,12 @@ private extension URL {
 
 extension URL {
   public var redactedString: String {
+    redactedString(host: "abs.invalid")
+  }
+
+  public func redactedString(host: String) -> String {
     var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
-    components?.host = "abs.invalid"
+    components?.host = host
     components?.port = nil
     return components?.string ?? relativePath
   }
