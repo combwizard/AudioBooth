@@ -58,7 +58,6 @@ struct BookPlayerControls: View {
             Image(systemName: model.isPlaying ? "pause.fill" : "play.fill")
               .font(.system(size: 32))
               .foregroundColor(.black)
-              .offset(x: model.isPlaying ? 0 : 3)
               .padding()
           }
         }

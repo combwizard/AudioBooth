@@ -161,7 +161,6 @@ struct LegacyMiniBookPlayer: View {
               Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                 .font(.system(size: 16))
                 .foregroundColor(.white)
-                .offset(x: player.isPlaying ? 0 : 2)
             }
           }
         }
