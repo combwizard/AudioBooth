@@ -121,9 +121,11 @@ struct HomePage: View {
       NavigationView {
         SettingsView(model: SettingsViewModel())
       }
+      .displaySheetScaled()
     }
     .sheet(isPresented: $showingServerList) {
       ServerListPage(model: ServerListModel())
+        .displaySheetScaled()
     }
     .sheet(isPresented: $showingServerDetails) {
       if let server = authentication.server {
@@ -140,6 +142,7 @@ struct HomePage: View {
               }
             }
         }
+        .displaySheetScaled()
       }
     }
     .onAppear {

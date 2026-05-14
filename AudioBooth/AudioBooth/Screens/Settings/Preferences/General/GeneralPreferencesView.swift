@@ -30,8 +30,10 @@ struct GeneralPreferencesView: View {
       }
 
       Section("Appearance") {
+        #if targetEnvironment(macCatalyst)
         AppIconPickerView()
           .listRowBackground(theme.colors.background.card)
+        #endif
 
         ThemePickerView()
           .listRowBackground(theme.colors.background.card)
@@ -43,7 +45,7 @@ struct GeneralPreferencesView: View {
           .listRowBackground(theme.colors.background.card)
 
         #if targetEnvironment(macCatalyst)
-        Stepper(value: $preferences.displayScale, in: 0.8...2.0, step: 0.05) {
+        VStack(alignment: .leading, spacing: 4) {
           HStack {
             Text("Display Scale")
               .font(.subheadline)
@@ -53,6 +55,7 @@ struct GeneralPreferencesView: View {
               .font(.subheadline)
               .foregroundStyle(.secondary)
           }
+          Slider(value: $preferences.displayScale, in: 0.8...2.0, step: 0.05)
         }
         .listRowBackground(theme.colors.background.card)
         #endif
