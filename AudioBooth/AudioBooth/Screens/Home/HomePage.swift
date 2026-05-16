@@ -16,6 +16,13 @@ struct HomePage: View {
     preferences.continueSectionSize.value / 120 * cardWidth
   }
 
+  private var title: Text {
+    if let username = authentication.server?.username, !username.isEmpty {
+      return Text("Hi, \(username)")
+    }
+    return Text("Home")
+  }
+
   @StateObject var model: Model
   @State private var showingSettings = false
   @State private var showingServerList = false
@@ -81,7 +88,7 @@ struct HomePage: View {
       .padding(.bottom)
     }
     .background(theme.colors.background.page)
-    .navigationTitle("Home")
+    .navigationTitle(title)
     .toolbar {
       serverMenuToolbarItem
 

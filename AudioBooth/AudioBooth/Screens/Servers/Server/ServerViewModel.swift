@@ -94,17 +94,12 @@ final class ServerViewModel: ServerView.Model {
         selectedLibrary = nil
       }
 
+      username = server.username
       switch server.token {
       case .legacy:
-        username = nil
         canExportConnection = false
         connectionSharingModel = nil
-      case .bearer(let accessToken, _, _):
-        username = JWT(accessToken)?.username
-        canExportConnection = true
-        connectionSharingModel = ConnectionSharingPageViewModel(server: server)
-      case .apiKey(let key):
-        username = JWT(key)?.name
+      case .bearer, .apiKey:
         canExportConnection = true
         connectionSharingModel = ConnectionSharingPageViewModel(server: server)
       }

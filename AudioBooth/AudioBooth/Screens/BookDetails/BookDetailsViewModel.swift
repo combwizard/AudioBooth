@@ -421,7 +421,7 @@ final class BookDetailsViewModel: BookDetailsView.Model {
   private func updateActions() {
     var updatedActions: BookDetailsView.Model.Actions = []
 
-    if authenticationService.permissions?.update == true {
+    if authenticationService.server?.permissions?.update == true {
       updatedActions.insert(.addToCollection)
     }
 

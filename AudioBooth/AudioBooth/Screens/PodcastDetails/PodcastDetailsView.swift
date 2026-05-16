@@ -64,7 +64,7 @@ struct PodcastDetailsView: View {
       }
     }
     .toolbar {
-      if audiobookshelf.authentication.permissions?.download == true {
+      if audiobookshelf.authentication.server?.permissions?.download == true {
         ToolbarItem(placement: .topBarTrailing) {
           ConfirmationButton(
             confirmation: .init(

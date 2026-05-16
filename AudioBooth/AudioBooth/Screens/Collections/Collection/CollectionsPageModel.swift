@@ -12,7 +12,7 @@ final class CollectionsPageModel: CollectionsPage.Model {
   private var cancellables = Set<AnyCancellable>()
 
   init(mode: CollectionMode) {
-    let permissions = Audiobookshelf.shared.authentication.permissions
+    let permissions = Audiobookshelf.shared.authentication.server?.permissions
 
     let canDelete: Bool
 

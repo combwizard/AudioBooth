@@ -80,10 +80,7 @@ public struct JWT {
     case unknown
   }
 
-  public let userID: String?
   public let exp: TimeInterval?
-  public let username: String?
-  public let name: String?
   public let type: Category
 
   public init?(_ token: String) {
@@ -105,9 +102,6 @@ public struct JWT {
       return nil
     }
 
-    self.userID = json["userId"] as? String
-    self.username = json["username"] as? String
-    self.name = json["name"] as? String
     self.exp = json["exp"] as? TimeInterval
     self.type = (json["type"] as? String).flatMap(Category.init) ?? .unknown
   }

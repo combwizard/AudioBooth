@@ -44,6 +44,40 @@ public final class Server: @unchecked Sendable {
 
   public let storage: UserDefaults
 
+  enum StorageKeys {
+    static let username = "username"
+    static let permissions = "permissions"
+  }
+
+  public var username: String? {
+    get { storage.string(forKey: StorageKeys.username) }
+    set {
+      if let newValue {
+        storage.set(newValue, forKey: StorageKeys.username)
+      } else {
+        storage.removeObject(forKey: StorageKeys.username)
+      }
+    }
+  }
+
+  public var permissions: User.Permissions? {
+    get {
+      guard let data = storage.data(forKey: StorageKeys.permissions) else { return nil }
+      return try? JSONDecoder().decode(User.Permissions.self, from: data)
+    }
+    set {
+      if let newValue, let data = try? JSONEncoder().encode(newValue) {
+        storage.set(data, forKey: StorageKeys.permissions)
+      } else {
+        storage.removeObject(forKey: StorageKeys.permissions)
+      }
+    }
+  }
+
+  public func clearStorage() {
+    storage.removePersistentDomain(forName: "connection.\(id)")
+  }
+
   public init(connection: Connection) {
     self.id = connection.id
     self.baseURL = connection.serverURL

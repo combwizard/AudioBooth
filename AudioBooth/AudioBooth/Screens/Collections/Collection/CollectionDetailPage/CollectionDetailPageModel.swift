@@ -16,7 +16,7 @@ final class CollectionDetailPageModel: CollectionDetailPage.Model {
   init(collectionID: String, mode: CollectionMode) {
     self.collectionID = collectionID
 
-    let permissions = Audiobookshelf.shared.authentication.permissions
+    let permissions = Audiobookshelf.shared.authentication.server?.permissions
     let canEdit: Bool
     let canDelete: Bool
 

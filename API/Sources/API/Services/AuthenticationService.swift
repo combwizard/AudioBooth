@@ -10,7 +10,6 @@ public final class AuthenticationService: ObservableObject {
   enum Keys {
     static let connections = "audiobookshelf_server_connections"
     static let activeServerID = "audiobookshelf_active_server_id"
-    static let permissions = "audiobookshelf_user_permissions"
   }
 
   private var connections: [String: Connection] = [:] {
@@ -39,21 +38,6 @@ public final class AuthenticationService: ObservableObject {
 
   public var serverURL: URL? { server?.activeURL }
   public var isAuthenticated: Bool { server != nil }
-
-  public var permissions: User.Permissions? {
-    get {
-      guard let data = UserDefaults.standard.data(forKey: Keys.permissions) else { return nil }
-      return try? JSONDecoder().decode(User.Permissions.self, from: data)
-    }
-    set {
-      if let newValue {
-        guard let data = try? JSONEncoder().encode(newValue) else { return }
-        UserDefaults.standard.set(data, forKey: Keys.permissions)
-      } else {
-        UserDefaults.standard.removeObject(forKey: Keys.permissions)
-      }
-    }
-  }
 
   init(audiobookshelf: Audiobookshelf) {
     self.audiobookshelf = audiobookshelf
@@ -359,6 +343,8 @@ public final class AuthenticationService: ObservableObject {
   }
 
   public func removeServer(_ serverID: String) {
+    servers[serverID]?.clearStorage()
+
     var allConnections = connections
     allConnections.removeValue(forKey: serverID)
     connections = allConnections
@@ -416,7 +402,6 @@ public final class AuthenticationService: ObservableObject {
 
   public func logout(serverID: String) {
     if server?.id == serverID {
-      permissions = nil
       audiobookshelf.libraries.current = nil
       ImagePipeline.shared.cache.removeAll()
     }
@@ -425,10 +410,12 @@ public final class AuthenticationService: ObservableObject {
   }
 
   public func logoutAll() {
+    for server in servers.values {
+      server.clearStorage()
+    }
     connections = [:]
     servers = [:]
     server = nil
-    permissions = nil
     audiobookshelf.libraries.current = nil
     audiobookshelf.libraries.clearAllCaches()
     ImagePipeline.shared.cache.removeAll()
@@ -450,7 +437,8 @@ public final class AuthenticationService: ObservableObject {
     do {
       let response = try await networkService.send(request)
       let authorize = response.value
-      permissions = authorize.user.permissions
+      server?.permissions = authorize.user.permissions
+      server?.username = authorize.user.username
       audiobookshelf.misc.ereaderDevices = authorize.ereaderDevices
       audiobookshelf.libraries.sortingIgnorePrefix = authorize.serverSettings.sortingIgnorePrefix
       return authorize
@@ -476,7 +464,10 @@ public final class AuthenticationService: ObservableObject {
     do {
       let response = try await networkService.send(request)
       let user = response.value
-      permissions = user.permissions
+      server?.permissions = user.permissions
+      if let username = user.username {
+        server?.username = username
+      }
       return user
     } catch {
       throw Audiobookshelf.AudiobookshelfError.networkError(

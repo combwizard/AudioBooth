@@ -24,7 +24,7 @@ struct PodcastEpisodeContextMenu: View {
           }
         }
 
-        if audiobookshelf.authentication.permissions?.download == true {
+        if audiobookshelf.authentication.server?.permissions?.download == true {
           switch model.downloadState {
           case .notDownloaded:
             Button(action: model.onDownloadTapped) {

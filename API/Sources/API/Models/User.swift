@@ -1,6 +1,7 @@
 import Foundation
 
 public struct User: Codable, Sendable {
+  public let username: String?
   public let mediaProgress: [MediaProgress]
   public let bookmarks: [Bookmark]
   public let permissions: Permissions

@@ -77,7 +77,7 @@ struct BookPlayer: View {
               }
             }
 
-            if Audiobookshelf.shared.authentication.permissions?.download == true,
+            if Audiobookshelf.shared.authentication.server?.permissions?.download == true,
               model.downloadState == .notDownloaded
             {
               Button(action: { model.onDownloadTapped() }) {

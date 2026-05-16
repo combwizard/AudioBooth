@@ -75,7 +75,7 @@ struct PodcastEpisodeDetailView: View {
       HStack(spacing: 12) {
         playButton
 
-        if audiobookshelf.authentication.permissions?.download == true {
+        if audiobookshelf.authentication.server?.permissions?.download == true {
           downloadButton
         }
 
