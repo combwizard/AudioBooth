@@ -36,8 +36,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
       _ = CrashReporter.shared
     }
 
-    LegacyMigration.migrateIfNeeded()
-
     Audiobookshelf.shared.onServerSwitched = { serverID, serverURL in
       do {
         try ModelContextProvider.shared.switchToServer(serverID, serverURL: serverURL)
@@ -55,8 +53,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         )
       }
     }
-
-    LegacyMigration.migrateTrackPaths()
 
     _ = WatchConnectivityManager.shared
     _ = SessionManager.shared

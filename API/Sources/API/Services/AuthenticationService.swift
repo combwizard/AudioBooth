@@ -42,10 +42,7 @@ public final class AuthenticationService: ObservableObject {
   init(audiobookshelf: Audiobookshelf) {
     self.audiobookshelf = audiobookshelf
 
-    migrateLegacyConnection()
-
-    if connections.isEmpty,
-      let data = try? keychain.data(forKey: Keys.connections),
+    if let data = try? keychain.data(forKey: Keys.connections),
       let decoded = try? JSONDecoder().decode([String: Connection].self, from: data)
     {
       self.connections = decoded
@@ -55,47 +52,6 @@ public final class AuthenticationService: ObservableObject {
         self.server = servers[activeServerID]
       }
     }
-  }
-
-  public func migrateLegacyConnection() {
-    struct LegacyConnection: Codable {
-      let serverURL: URL
-      let token: String
-      let customHeaders: [String: String]?
-      let alias: String?
-    }
-
-    let legacyConnectionKey = "audiobookshelf_server_connection"
-
-    guard let legacyData = try? keychain.data(forKey: legacyConnectionKey) else {
-      return
-    }
-
-    guard let legacyConnection = try? JSONDecoder().decode(LegacyConnection.self, from: legacyData)
-    else {
-      AppLogger.authentication.error("Failed to decode legacy connection")
-      return
-    }
-
-    AppLogger.authentication.info("Migrating legacy connection to multi-server format")
-
-    do {
-      try keychain.deleteItem(forKey: legacyConnectionKey)
-    } catch {
-      AppLogger.authentication.error("Failed to remove legacy key: \(error.localizedDescription)")
-      return
-    }
-
-    let connection = Connection(
-      serverURL: legacyConnection.serverURL,
-      token: .legacy(token: legacyConnection.token),
-      customHeaders: legacyConnection.customHeaders ?? [:],
-      alias: legacyConnection.alias
-    )
-
-    self.connections = [connection.id: connection]
-    self.servers = [connection.id: Server(connection: connection)]
-    self.server = servers.first?.value
   }
 
   public func login(
