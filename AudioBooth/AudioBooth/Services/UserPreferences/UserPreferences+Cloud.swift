@@ -39,6 +39,7 @@ extension UserPreferences {
     "colorScheme",
     "appTheme",
     "continueSectionSize",
+    "showUsernameGreeting",
     "ebookReader.fontSize",
     "ebookReader.fontWeight",
     "ebookReader.textNormalization",

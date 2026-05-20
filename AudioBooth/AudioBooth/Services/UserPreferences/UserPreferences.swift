@@ -145,6 +145,9 @@ final class UserPreferences: ObservableObject {
   @AppStorage("continueSectionSize")
   var continueSectionSize: ContinueSectionSize = .default
 
+  @AppStorage("showUsernameGreeting")
+  var showUsernameGreeting: Bool = true
+
   @AppStorage("autoPlayNextInQueue")
   var autoPlayNextInQueue: Bool = true
 

@@ -10,6 +10,14 @@ struct HomePreferencesView: View {
   var body: some View {
     Form {
       Section {
+        Toggle("Show Username", isOn: $preferences.showUsernameGreeting)
+          .listRowBackground(theme.colors.background.card)
+      } footer: {
+        Text("Show your server username in the Home title.")
+          .font(.caption)
+      }
+
+      Section {
         CoverSizePickerView(selection: $preferences.continueSectionSize)
           .listRowBackground(theme.colors.background.card)
       } header: {

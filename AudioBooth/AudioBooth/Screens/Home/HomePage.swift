@@ -17,7 +17,9 @@ struct HomePage: View {
   }
 
   private var title: Text {
-    if let username = authentication.server?.username, !username.isEmpty {
+    if preferences.showUsernameGreeting,
+      let username = authentication.server?.username, !username.isEmpty
+    {
       return Text("Hi, \(username)")
     }
     return Text("Home")
