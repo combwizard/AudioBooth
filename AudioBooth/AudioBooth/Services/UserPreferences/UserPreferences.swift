@@ -91,6 +91,9 @@ final class UserPreferences: ObservableObject {
   @AppStorage("hideChapterSkipButtons")
   var hideChapterSkipButtons: Bool = false
 
+  @AppStorage("keepScreenAwakeInPlayer")
+  var keepScreenAwakeInPlayer: Bool = false
+
   @AppStorage("volumeLevel")
   var volumeLevel: Double = 1.0
 

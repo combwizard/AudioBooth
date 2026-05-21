@@ -8,16 +8,6 @@ struct GeneralPreferencesView: View {
   var body: some View {
     Form {
       Section("Behavior") {
-        Toggle(isOn: $preferences.openPlayerOnLaunch) {
-          PreferenceRow(
-            systemImage: "play.circle",
-            tint: .green,
-            title: "Open Player on Launch",
-            subtitle: "Skip the home screen on reopen"
-          )
-        }
-        .listRowBackground(theme.colors.background.card)
-
         Toggle(isOn: $preferences.hapticsEnabled) {
           PreferenceRow(
             systemImage: "bolt",

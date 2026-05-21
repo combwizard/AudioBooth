@@ -22,6 +22,7 @@ extension UserPreferences {
     "showFullBookDuration",
     "showBookProgressBar",
     "hideChapterSkipButtons",
+    "keepScreenAwakeInPlayer",
     "volumeLevel",
     "libraryDisplayMode",
     "collapseSeriesInLibrary",

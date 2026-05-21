@@ -35,6 +35,30 @@ struct PlayerPreferencesView: View {
       }
 
       Section {
+        Toggle(isOn: $preferences.openPlayerOnLaunch) {
+          PreferenceRow(
+            systemImage: "play.circle",
+            tint: .green,
+            title: "Open Player on Launch",
+            subtitle: "Skip the home screen on reopen"
+          )
+        }
+        .listRowBackground(theme.colors.background.card)
+
+        Toggle(isOn: $preferences.keepScreenAwakeInPlayer) {
+          PreferenceRow(
+            systemImage: "sun.max",
+            tint: .yellow,
+            title: "Keep Screen Awake",
+            subtitle: "Prevent auto-lock while the player is open"
+          )
+        }
+        .listRowBackground(theme.colors.background.card)
+      } header: {
+        Text("Behavior")
+      }
+
+      Section {
         NavigationLink {
           ControlsLayoutPreferencesView()
         } label: {
@@ -73,18 +97,6 @@ struct PlayerPreferencesView: View {
         .listRowBackground(theme.colors.background.card)
 
         NavigationLink {
-          LockScreenPreferencesView()
-        } label: {
-          PreferenceRow(
-            systemImage: "lock",
-            tint: .blue,
-            title: "Lock Screen",
-            subtitle: preferences.lockScreenNextPreviousUsesChapters ? "Skip by chapters" : "Skip by seconds"
-          )
-        }
-        .listRowBackground(theme.colors.background.card)
-
-        NavigationLink {
           PlaybackDisplayPreferencesView()
         } label: {
           PreferenceRow(
@@ -92,6 +104,18 @@ struct PlayerPreferencesView: View {
             tint: .indigo,
             title: "Playback Display",
             subtitle: playbackDisplaySubtitle
+          )
+        }
+        .listRowBackground(theme.colors.background.card)
+
+        NavigationLink {
+          LockScreenPreferencesView()
+        } label: {
+          PreferenceRow(
+            systemImage: "lock",
+            tint: .blue,
+            title: "Lock Screen",
+            subtitle: preferences.lockScreenNextPreviousUsesChapters ? "Skip by chapters" : "Skip by seconds"
           )
         }
         .listRowBackground(theme.colors.background.card)
