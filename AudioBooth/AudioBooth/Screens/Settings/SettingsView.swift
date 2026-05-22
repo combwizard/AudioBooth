@@ -51,7 +51,7 @@ struct SettingsView: View {
             PreferenceRow(
               systemImage: "cylinder",
               tint: .blue,
-              title: "Storage",
+              title: String(localized: "Storage"),
               subtitle: storageSubtitle
             )
           }
