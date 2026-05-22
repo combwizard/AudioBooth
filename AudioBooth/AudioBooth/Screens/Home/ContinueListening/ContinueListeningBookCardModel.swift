@@ -28,19 +28,21 @@ final class ContinueListeningBookCardModel: BookCard.Model {
     super.init(
       id: book.id,
       title: book.title,
-      details: timeRemaining,
+      details: nil,
       cover: Cover.Model(
         url: book.coverURL(),
         title: book.title,
         author: book.authorName,
         progress: MediaProgress.progress(for: book.id)
       ),
+      author: book.authorName,
       contextMenu: BookCardContextMenuModel(
         book,
         onProgressChanged: nil,
         onRemoveFromContinueListening: onRemoved
       ),
-      isExplicit: book.media.metadata.explicit ?? false
+      isExplicit: book.media.metadata.explicit ?? false,
+      timeRemaining: timeRemaining
     )
 
     observeMediaProgress()
@@ -55,19 +57,21 @@ final class ContinueListeningBookCardModel: BookCard.Model {
     super.init(
       id: localBook.bookID,
       title: localBook.title,
-      details: timeRemaining,
+      details: nil,
       cover: Cover.Model(
         url: localBook.coverURL,
         title: localBook.title,
         author: localBook.authorNames,
         progress: MediaProgress.progress(for: localBook.bookID)
       ),
+      author: localBook.authorNames,
       contextMenu: BookCardContextMenuModel(
         localBook,
         onProgressChanged: nil,
         onRemoveFromContinueListening: onRemoved
       ),
-      isExplicit: localBook.isExplicit
+      isExplicit: localBook.isExplicit,
+      timeRemaining: timeRemaining
     )
 
     observeMediaProgress()
@@ -83,13 +87,15 @@ final class ContinueListeningBookCardModel: BookCard.Model {
       id: episode.episodeID,
       podcastID: episode.podcast?.podcastID,
       title: episode.title,
-      details: timeRemaining,
+      details: nil,
       cover: Cover.Model(
         url: episode.coverURL,
         title: episode.title,
         author: episode.podcast?.author,
         progress: MediaProgress.progress(for: episode.episodeID)
-      )
+      ),
+      author: episode.podcast?.author,
+      timeRemaining: timeRemaining
     )
 
     observeMediaProgress()
@@ -133,9 +139,9 @@ extension ContinueListeningBookCardModel {
         if let current = PlayerManager.shared.current,
           [id].contains(current.id)
         {
-          details = current.playbackProgress.totalTimeRemaining.formattedTimeRemaining
+          timeRemaining = current.playbackProgress.totalTimeRemaining.formattedTimeRemaining
         } else {
-          details = remainingTime.formattedTimeRemaining
+          timeRemaining = remainingTime.formattedTimeRemaining
         }
       }
     }

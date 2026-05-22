@@ -4,6 +4,7 @@ import SwiftUI
 struct SeriesCard: View {
   @Bindable var model: Model
   @Environment(\.itemDisplayMode) private var displayMode
+  @ObservedObject private var preferences = UserPreferences.shared
 
   @ScaledMetric(relativeTo: .title) private var rowCoverSize: CGFloat = 60
 
@@ -69,12 +70,14 @@ struct SeriesCard: View {
     VStack(alignment: .leading, spacing: 6) {
       stackedCovers
 
-      Text(model.title)
-        .font(.caption)
-        .fontWeight(.medium)
-        .lineLimit(2)
-        .multilineTextAlignment(.leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
+      if !preferences.cardMinimalMode {
+        Text(model.title)
+          .font(.caption)
+          .fontWeight(.medium)
+          .lineLimit(2)
+          .multilineTextAlignment(.leading)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

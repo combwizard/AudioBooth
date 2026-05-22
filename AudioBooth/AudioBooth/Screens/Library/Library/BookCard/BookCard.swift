@@ -96,19 +96,28 @@ extension BookCard {
       VStack(alignment: .leading, spacing: 8) {
         cover
 
-        VStack(alignment: .leading, spacing: 2) {
-          title
+        if !preferences.cardMinimalMode {
+          VStack(alignment: .leading, spacing: 2) {
+            title
 
-          if preferences.showBookSubtitle, let subtitle = model.subtitle, !subtitle.isEmpty {
-            Text(subtitle)
-              .font(.system(size: subtitleFontSize))
-              .foregroundColor(.secondary)
-              .lineLimit(1)
+            if preferences.showBookSubtitle, let subtitle = model.subtitle, !subtitle.isEmpty {
+              Text(subtitle)
+                .font(.system(size: subtitleFontSize))
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+            }
+
+            details
           }
-
-          details
+          .multilineTextAlignment(.leading)
+        } else if preferences.showContinueTimeRemaining, let timeRemaining = model.timeRemaining {
+          Text(timeRemaining)
+            .font(.caption2)
+            .foregroundColor(.secondary)
+            .lineLimit(1)
+            .allowsTightening(true)
+            .multilineTextAlignment(.leading)
         }
-        .multilineTextAlignment(.leading)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .contentShape(Rectangle())
@@ -248,13 +257,20 @@ extension BookCard {
 
     @ViewBuilder
     private var details: some View {
-      if let details = model.details ?? model.author {
-        Text(details)
+      if let text = detailsText {
+        Text(text)
           .font(.caption2)
           .foregroundColor(.secondary)
           .lineLimit(1)
           .allowsTightening(true)
       }
+    }
+
+    private var detailsText: String? {
+      if let timeRemaining = model.timeRemaining {
+        return preferences.showContinueTimeRemaining ? timeRemaining : model.author
+      }
+      return model.details ?? model.author
     }
 
     @ViewBuilder
@@ -327,6 +343,7 @@ extension BookCard {
     var episodeContextMenu: PodcastEpisodeContextMenu.Model?
     let hasEbook: Bool
     let isExplicit: Bool
+    var timeRemaining: String?
 
     func onAppear() {}
 
@@ -344,7 +361,8 @@ extension BookCard {
       contextMenu: BookCardContextMenu.Model? = nil,
       episodeContextMenu: PodcastEpisodeContextMenu.Model? = nil,
       hasEbook: Bool = false,
-      isExplicit: Bool = false
+      isExplicit: Bool = false,
+      timeRemaining: String? = nil
     ) {
       self.id = id
       self.podcastID = podcastID
@@ -360,6 +378,7 @@ extension BookCard {
       self.episodeContextMenu = episodeContextMenu
       self.hasEbook = hasEbook
       self.isExplicit = isExplicit
+      self.timeRemaining = timeRemaining
     }
   }
 }

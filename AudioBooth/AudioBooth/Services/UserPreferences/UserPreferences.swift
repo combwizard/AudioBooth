@@ -112,6 +112,12 @@ final class UserPreferences: ObservableObject {
   @AppStorage("showBookSubtitle")
   var showBookSubtitle: Bool = false
 
+  @AppStorage("cardMinimalMode")
+  var cardMinimalMode: Bool = false
+
+  @AppStorage("showContinueTimeRemaining")
+  var showContinueTimeRemaining: Bool = true
+
   @AppStorage("groupSeriesInOffline")
   var groupSeriesInOffline: Bool = false
 

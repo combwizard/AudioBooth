@@ -65,10 +65,9 @@ struct AuthorCard: View {
       }
 
       Text(model.name)
-        .font(.footnote)
-        .fontWeight(.bold)
+        .font(.caption)
+        .fontWeight(.medium)
         .lineLimit(2)
-        .padding(.horizontal)
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity, alignment: .center)
     }

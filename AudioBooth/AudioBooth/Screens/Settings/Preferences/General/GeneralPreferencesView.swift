@@ -34,6 +34,9 @@ struct GeneralPreferencesView: View {
         ColorSchemePickerView()
           .listRowBackground(theme.colors.background.card)
 
+        CardMinimalModePickerView()
+          .listRowBackground(theme.colors.background.card)
+
         #if targetEnvironment(macCatalyst)
         VStack(alignment: .leading, spacing: 4) {
           HStack {

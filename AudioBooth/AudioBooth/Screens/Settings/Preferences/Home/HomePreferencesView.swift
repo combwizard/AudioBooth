@@ -20,11 +20,16 @@ struct HomePreferencesView: View {
       Section {
         CoverSizePickerView(selection: $preferences.continueSectionSize)
           .listRowBackground(theme.colors.background.card)
+
+        Toggle("Show Time Remaining", isOn: $preferences.showContinueTimeRemaining)
+          .listRowBackground(theme.colors.background.card)
       } header: {
-        Text("Cover Size")
+        Text("Continue Books")
       } footer: {
-        Text("Cover art size for Continue Listening and Continue Reading.")
-          .font(.caption)
+        Text(
+          "Cover art size and details for Continue Listening and Continue Reading. When off, the author is shown instead."
+        )
+        .font(.caption)
       }
 
       Section {
