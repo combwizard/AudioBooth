@@ -113,6 +113,22 @@ struct EbookReaderView: View {
     .onDisappear(perform: model.onDisappear)
     .statusBarHidden(!showControls)
     .preferredColorScheme(preferredColorScheme)
+    .background {
+      if volumeButtonsEnabled {
+        VolumeButtonObserver(
+          onVolumeUp: { model.onTapRight() },
+          onVolumeDown: { model.onTapLeft() }
+        )
+        .allowsHitTesting(false)
+      }
+    }
+  }
+
+  private var volumeButtonsEnabled: Bool {
+    model.preferences.useVolumeButtonsForPageTurn
+      && !model.isLoading
+      && model.error == nil
+      && !playerManager.isPlaying
   }
 
   private var loadingView: some View {

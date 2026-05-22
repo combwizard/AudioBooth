@@ -69,6 +69,7 @@ class EbookReaderPreferences: ObservableObject {
   @AppStorage("ebookReader.columnCount") var columnCount: ColumnCount = .auto
   @AppStorage("ebookReader.scroll") var scroll: Bool = false
   @AppStorage("ebookReader.tapToNavigate") var tapToNavigate: Bool = true
+  @AppStorage("ebookReader.useVolumeButtonsForPageTurn") var useVolumeButtonsForPageTurn: Bool = false
   @AppStorage("ebookReader.autoScrollSpeed") var autoScrollSpeed: Double = 0.0
   @AppStorage("ebookReader.progressDisplay") var progressDisplay: EbookProgressDisplay = .percent
 

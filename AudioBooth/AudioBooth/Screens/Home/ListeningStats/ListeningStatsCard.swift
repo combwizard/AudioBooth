@@ -28,7 +28,7 @@ struct ListeningStatsCard: View {
 
       HStack {
         VStack(alignment: .leading, spacing: 12) {
-          if model.isLoading {
+          if model.isLoading, model.weekData.isEmpty {
             ProgressView()
               .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
           } else {

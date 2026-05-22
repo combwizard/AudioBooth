@@ -57,6 +57,8 @@ struct EbookReaderPreferencesView: View {
           }
           Toggle("Tap to Navigate", isOn: $preferences.tapToNavigate)
 
+          Toggle("Volume to Navigate", isOn: $preferences.useVolumeButtonsForPageTurn)
+
           if preferences.tapToNavigate, let onEditZones {
             Button {
               onEditZones()
