@@ -163,6 +163,9 @@ final class UserPreferences: ObservableObject {
   @AppStorage("continueSectionSize")
   var continueSectionSize: ContinueSectionSize = .default
 
+  @AppStorage("continueListeningStyle")
+  var continueListeningStyle: ContinueListeningStyle = .carousel
+
   @AppStorage("showUsernameGreeting")
   var showUsernameGreeting: Bool = true
 
@@ -469,6 +472,18 @@ struct EqualizerSettings: Equatable, RawRepresentable {
     let enabled = isEnabled ? "1" : "0"
     let gains = bandGains.map { String($0) }.joined(separator: ",")
     return "\(enabled)|\(preamp)|\(gains)"
+  }
+}
+
+enum ContinueListeningStyle: String, CaseIterable {
+  case carousel
+  case coverFlow
+
+  var displayText: LocalizedStringResource {
+    switch self {
+    case .carousel: "Carousel"
+    case .coverFlow: "Cover Flow"
+    }
   }
 }
 

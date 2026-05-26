@@ -18,6 +18,13 @@ struct HomePreferencesView: View {
       }
 
       Section {
+        Picker("Style", selection: $preferences.continueListeningStyle) {
+          ForEach(ContinueListeningStyle.allCases, id: \.self) { style in
+            Text(style.displayText).tag(style)
+          }
+        }
+        .listRowBackground(theme.colors.background.card)
+
         CoverSizePickerView(selection: $preferences.continueSectionSize)
           .listRowBackground(theme.colors.background.card)
 

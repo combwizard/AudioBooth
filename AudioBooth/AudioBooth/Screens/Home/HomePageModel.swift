@@ -21,6 +21,9 @@ final class HomePageModel: HomePage.Model {
   private var isFetching = false
   private var discoverBooks: [Book] = []
 
+  private var continueListening: ContinueListeningCoverFlowView.Model?
+  private var continueReading: ContinueListeningCoverFlowView.Model?
+
   init() {
     super.init()
     loadCachedContent()
@@ -74,6 +77,8 @@ final class HomePageModel: HomePage.Model {
     personalizedSections = []
     pinnedPlaylist = nil
     discoverBooks = []
+    continueListening = nil
+    continueReading = nil
     sections = []
     isLoading = false
 
@@ -160,10 +165,13 @@ extension HomePageModel {
           continue
         } else if section.id == "continue-reading" {
           let books = items.map({ BookCardModel($0, sortBy: .title) })
+          let model = continueReading ?? .init(items: books)
+          model.items = books
+          continueReading = model
           sectionsByID[section.id] = .init(
             id: section.id,
             title: title,
-            items: .continueBooks(books)
+            items: .continueBooks(model)
           )
         } else if section.id == "continue-series" {
           let books = items.map({ BookCardModel($0, sortBy: .title, options: .showSequence) })
@@ -271,11 +279,9 @@ extension HomePageModel {
 
   private func buildBooksContinueListeningSection() -> Section? {
     let existingModels: [String: ContinueListeningBookCardModel]
-    if let existingSection = sections.first(where: { $0.id == "continue-listening" }),
-      case .continueBooks(let items) = existingSection.items
-    {
+    if let continueListening {
       existingModels = Dictionary(
-        uniqueKeysWithValues: items.compactMap { item in
+        uniqueKeysWithValues: continueListening.items.compactMap { item in
           guard let cardModel = item as? ContinueListeningBookCardModel else { return nil }
           return (cardModel.id, cardModel)
         }
@@ -332,20 +338,22 @@ extension HomePageModel {
 
     guard !sorted.isEmpty else { return nil }
 
+    let model = continueListening ?? .init(items: sorted)
+    model.items = sorted
+    continueListening = model
+
     return Section(
       id: "continue-listening",
       title: String(localized: "Continue Listening"),
-      items: .continueBooks(sorted)
+      items: .continueBooks(model)
     )
   }
 
   private func buildEpisodesContinueListeningSection() -> Section? {
     let existingModels: [String: BookCard.Model]
-    if let existingSection = sections.first(where: { $0.id == "continue-listening" }),
-      case .continueBooks(let items) = existingSection.items
-    {
+    if let continueListening {
       existingModels = Dictionary(
-        uniqueKeysWithValues: items.map { ($0.id, $0) }
+        uniqueKeysWithValues: continueListening.items.map { ($0.id, $0) }
       )
     } else {
       existingModels = [:]
@@ -374,10 +382,14 @@ extension HomePageModel {
 
     guard !models.isEmpty else { return nil }
 
+    let model = continueListening ?? .init(items: models)
+    model.items = models
+    continueListening = model
+
     return Section(
       id: "continue-listening",
       title: String(localized: "Continue Listening"),
-      items: .continueBooks(models)
+      items: .continueBooks(model)
     )
   }
 

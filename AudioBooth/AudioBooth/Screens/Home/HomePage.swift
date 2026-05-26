@@ -30,8 +30,6 @@ struct HomePage: View {
   @State private var showingServerList = false
   @State private var showingServerDetails = false
 
-  @State private var path = NavigationPath()
-
   var body: some View {
     NavigationStack {
       content
@@ -217,7 +215,7 @@ struct HomePage: View {
           .padding(.horizontal)
         }
 
-      case .continueBooks(let items):
+      case .continueBooks(let model):
         Text(section.title)
           .font(.title2)
           .fontWeight(.semibold)
@@ -225,14 +223,20 @@ struct HomePage: View {
           .padding(.horizontal)
           .accessibilityAddTraits(.isHeader)
 
-        ScrollView(.horizontal, showsIndicators: false) {
-          LazyHStack(alignment: .top, spacing: 16) {
-            ForEach(items, id: \.id) { item in
-              BookCard(model: item)
-                .frame(width: continueSectionWidth)
+        switch preferences.continueListeningStyle {
+        case .carousel:
+          ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(alignment: .top, spacing: 16) {
+              ForEach(model.items, id: \.id) { item in
+                BookCard(model: item)
+                  .frame(width: continueSectionWidth)
+              }
             }
+            .padding(.horizontal)
           }
-          .padding(.horizontal)
+
+        case .coverFlow:
+          ContinueListeningCoverFlowView(model: model)
         }
 
       case .books(let items):
@@ -407,7 +411,7 @@ extension HomePage {
 
       enum Items {
         case stats
-        case continueBooks([BookCard.Model])
+        case continueBooks(ContinueListeningCoverFlowView.Model)
         case playlist(id: String, items: [BookCard.Model])
         case books([BookCard.Model])
         case series([SeriesCard.Model])
@@ -479,7 +483,7 @@ extension HomePage.Model {
         Section(
           id: "continue-listening",
           title: "Continue Listening",
-          items: .continueBooks(books)
+          items: .continueBooks(.init(items: books))
         )
       ]
     )
