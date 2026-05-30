@@ -153,7 +153,7 @@ struct AuthorDetailsView: View {
         HStack(alignment: .top, spacing: 16) {
           ForEach(seriesWithBooks.books) { book in
             BookCard(model: book)
-              .frame(width: cardWidth)
+              .frame(height: cardWidth * 1.5)
           }
         }
         .padding(.horizontal)
@@ -189,7 +189,7 @@ struct AuthorDetailsView: View {
         HStack(alignment: .top, spacing: 16) {
           ForEach(model.allBooks) { book in
             BookCard(model: book)
-              .frame(width: cardWidth)
+              .frame(height: cardWidth * 1.5)
           }
         }
         .padding(.horizontal)

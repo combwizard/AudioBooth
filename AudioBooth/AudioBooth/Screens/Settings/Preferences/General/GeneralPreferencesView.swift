@@ -34,8 +34,17 @@ struct GeneralPreferencesView: View {
         ColorSchemePickerView()
           .listRowBackground(theme.colors.background.card)
 
-        CardMinimalModePickerView()
-          .listRowBackground(theme.colors.background.card)
+        NavigationLink {
+          CardPreferencesView()
+        } label: {
+          PreferenceRow(
+            systemImage: "rectangle.on.rectangle",
+            tint: .teal,
+            title: "Cards",
+            subtitle: "Layout, aspect ratio, and corner radius"
+          )
+        }
+        .listRowBackground(theme.colors.background.card)
 
         #if targetEnvironment(macCatalyst)
         VStack(alignment: .leading, spacing: 4) {

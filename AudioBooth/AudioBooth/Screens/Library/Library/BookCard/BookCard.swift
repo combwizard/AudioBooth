@@ -78,6 +78,7 @@ extension BookCard {
 
     @ScaledMetric(relativeTo: .title) private var rowCoverSize: CGFloat = 60
     @ScaledMetric(relativeTo: .caption2) private var subtitleFontSize: CGFloat = 10
+    @State private var coverWidth: CGFloat = .infinity
 
     private var isEditing: Bool {
       editMode?.wrappedValue.isEditing ?? false
@@ -95,31 +96,38 @@ extension BookCard {
     private var cardLayout: some View {
       VStack(alignment: .leading, spacing: 8) {
         cover
-
-        if !preferences.cardMinimalMode {
-          VStack(alignment: .leading, spacing: 2) {
-            title
-
-            if preferences.showBookSubtitle, let subtitle = model.subtitle, !subtitle.isEmpty {
-              Text(subtitle)
-                .font(.system(size: subtitleFontSize))
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-            }
-
-            details
+          .onGeometryChange(for: CGFloat.self) {
+            $0.size.width
+          } action: { width in
+            coverWidth = width
           }
-          .multilineTextAlignment(.leading)
-        } else if preferences.showContinueTimeRemaining, let timeRemaining = model.timeRemaining {
-          Text(timeRemaining)
-            .font(.caption2)
-            .foregroundColor(.secondary)
-            .lineLimit(1)
-            .allowsTightening(true)
+
+        VStack(alignment: .leading, spacing: 8) {
+          if !preferences.cardMinimalMode {
+            VStack(alignment: .leading, spacing: 2) {
+              title
+
+              if preferences.showBookSubtitle, let subtitle = model.subtitle, !subtitle.isEmpty {
+                Text(subtitle)
+                  .font(.system(size: subtitleFontSize))
+                  .foregroundColor(.secondary)
+                  .lineLimit(1)
+              }
+
+              details
+            }
             .multilineTextAlignment(.leading)
+          } else if preferences.showContinueTimeRemaining, let timeRemaining = model.timeRemaining {
+            Text(timeRemaining)
+              .font(.caption2)
+              .foregroundColor(.secondary)
+              .lineLimit(1)
+              .allowsTightening(true)
+              .multilineTextAlignment(.leading)
+          }
         }
+        .frame(maxWidth: coverWidth, alignment: .leading)
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
       .contentShape(Rectangle())
     }
 

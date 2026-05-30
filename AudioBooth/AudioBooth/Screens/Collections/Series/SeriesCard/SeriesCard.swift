@@ -35,7 +35,7 @@ struct SeriesCard: View {
 
   var rowLayout: some View {
     HStack(spacing: 12) {
-      Cover(model: model.bookCovers.first ?? Cover.Model(url: nil), style: .plain)
+      Cover(model: model.bookCovers.first ?? Cover.Model(url: nil), style: .standard)
         .overlay(alignment: .bottom) {
           ProgressOverlay(progress: model.progress)
             .padding(2)
@@ -93,25 +93,19 @@ struct SeriesCard: View {
       ZStack(alignment: .topLeading) {
         ForEach(Array(covers.enumerated().reversed()), id: \.offset) { index, cover in
           if index == 0 {
-            Cover(model: cover, style: .plain)
+            Cover(model: cover, style: .standard)
               .frame(width: coverSize, height: coverSize)
               .overlay(alignment: .bottom) {
                 ProgressOverlay(progress: model.progress)
                   .padding(4)
               }
-              .clipShape(RoundedRectangle(cornerRadius: 8))
               .shadow(radius: 2)
               .overlay(alignment: .topTrailing) {
                 bookCountBadge
               }
           } else {
-            Cover(model: cover, style: .plain)
+            Cover(model: cover, style: .standard)
               .frame(width: coverSize, height: coverSize)
-              .overlay(alignment: .bottom) {
-                ProgressOverlay(progress: model.progress)
-                  .padding(4)
-              }
-              .clipShape(RoundedRectangle(cornerRadius: 8))
               .shadow(radius: 1)
               .offset(
                 x: CGFloat(index) * 4,

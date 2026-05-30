@@ -24,10 +24,10 @@ struct LibraryView: View {
           switch item {
           case .book(let model):
             BookCard(model: model)
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
           case .series(let model):
             SeriesCard(model: model)
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
           }
         }
 

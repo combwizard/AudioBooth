@@ -209,7 +209,7 @@ struct HomePage: View {
           HStack(alignment: .top, spacing: 16) {
             ForEach(items, id: \.id) { book in
               BookCard(model: book)
-                .frame(width: cardWidth)
+                .frame(height: cardWidth * 1.5)
             }
           }
           .padding(.horizontal)
@@ -229,7 +229,7 @@ struct HomePage: View {
             LazyHStack(alignment: .top, spacing: 16) {
               ForEach(model.items, id: \.id) { item in
                 BookCard(model: item)
-                  .frame(width: continueSectionWidth)
+                  .frame(height: continueSectionWidth * 1.5)
               }
             }
             .padding(.horizontal)
@@ -251,7 +251,7 @@ struct HomePage: View {
           HStack(alignment: .top, spacing: 16) {
             ForEach(items, id: \.id) { book in
               BookCard(model: book)
-                .frame(width: cardWidth)
+                .frame(height: cardWidth * 1.5)
             }
           }
           .padding(.horizontal)
@@ -269,7 +269,7 @@ struct HomePage: View {
           HStack(alignment: .top, spacing: 16) {
             ForEach(items) { series in
               SeriesCard(model: series, titleFont: .footnote)
-                .frame(width: cardWidth)
+                .frame(height: cardWidth * 1.5)
             }
           }
           .padding(.horizontal)

@@ -115,6 +115,15 @@ final class UserPreferences: ObservableObject {
   @AppStorage("cardMinimalMode")
   var cardMinimalMode: Bool = false
 
+  @AppStorage("cardCoverDynamicRatio")
+  var cardCoverDynamicRatio: Bool = false
+
+  @AppStorage("cardCoverCornerRadius")
+  var cardCoverCornerRadius: CardCornerRadius = .medium
+
+  @AppStorage("cardCoverBorderWidth")
+  var cardCoverBorderWidth: CardBorderWidth = .small
+
   @AppStorage("showContinueTimeRemaining")
   var showContinueTimeRemaining: Bool = true
 

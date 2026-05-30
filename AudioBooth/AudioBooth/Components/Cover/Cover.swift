@@ -7,6 +7,8 @@ struct Cover: View {
   let style: Style
   let size: Size
 
+  @ObservedObject private var preferences = UserPreferences.shared
+
   init(model: Model, style: Style = .standard, size: Size = .medium) {
     self.model = model
     self.style = style
@@ -17,6 +19,10 @@ struct Cover: View {
     self.model = Model(url: url)
     self.style = style
     self.size = size
+  }
+
+  private var effectiveStyle: Style {
+    preferences.cardCoverDynamicRatio ? .plain : style
   }
 
   var body: some View {
@@ -30,9 +36,9 @@ struct Cover: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .aspectRatio(style == .standard ? 1 : nil, contentMode: .fit)
+    .aspectRatio(effectiveStyle == .standard ? 1 : nil, contentMode: .fit)
     .background {
-      if style == .standard {
+      if effectiveStyle == .standard {
         LazyImage(url: model.url) { state in
           state.image?
             .resizable()
@@ -47,10 +53,10 @@ struct Cover: View {
       ProgressOverlay(progress: model.progress)
         .padding(size.progressPadding)
     }
-    .clipShape(RoundedRectangle(cornerRadius: 8))
+    .clipShape(RoundedRectangle(cornerRadius: preferences.cardCoverCornerRadius.value))
     .overlay {
-      RoundedRectangle(cornerRadius: 8)
-        .stroke(Color.gray.opacity(0.6), lineWidth: 1)
+      RoundedRectangle(cornerRadius: preferences.cardCoverCornerRadius.value)
+        .strokeBorder(Color.gray.opacity(0.6), lineWidth: preferences.cardCoverBorderWidth.value)
     }
     .id(model.url)
   }
