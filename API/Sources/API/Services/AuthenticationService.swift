@@ -385,6 +385,32 @@ public final class AuthenticationService: ObservableObject {
     }
   }
 
+  public func fetchListeningHistory(page: Int, itemsPerPage: Int) async throws -> ListeningHistoryResponse {
+    guard let networkService = audiobookshelf.networkService else {
+      throw Audiobookshelf.AudiobookshelfError.networkError(
+        "Network service not configured. Please login first."
+      )
+    }
+
+    let request = NetworkRequest<ListeningHistoryResponse>(
+      path: "/api/me/listening-sessions",
+      method: .get,
+      query: [
+        "page": String(page),
+        "itemsPerPage": String(itemsPerPage),
+      ]
+    )
+
+    do {
+      let response = try await networkService.send(request)
+      return response.value
+    } catch {
+      throw Audiobookshelf.AudiobookshelfError.networkError(
+        "Failed to fetch listening history: \(error.localizedDescription)"
+      )
+    }
+  }
+
   public func fetchListeningStats() async throws -> ListeningStats {
     guard let networkService = audiobookshelf.networkService else {
       throw Audiobookshelf.AudiobookshelfError.networkError(
