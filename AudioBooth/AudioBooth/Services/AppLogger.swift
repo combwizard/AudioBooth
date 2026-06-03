@@ -109,6 +109,18 @@ struct RedactingLogHandler: LogHandler {
       line: line
     )
   }
+
+  func log(event: LogEvent) {
+    let redacted = Logger.Message(stringLiteral: event.message.description.redactingURLs)
+    wrapped.log(
+      level: event.level,
+      message: redacted,
+      metadata: event.metadata,
+      file: event.file,
+      function: event.function,
+      line: event.line
+    )
+  }
 }
 
 extension NetworkLogger.Request {

@@ -28,8 +28,8 @@ struct AudioBoothWatch: App {
 
       func loadData(
         with request: URLRequest,
-        didReceiveData: @escaping (Data, URLResponse) -> Void,
-        completion: @escaping (Error?) -> Void
+        didReceiveData: @escaping @Sendable (Data, URLResponse) -> Void,
+        completion: @escaping @Sendable (Error?) -> Void
       ) -> any Cancellable {
         var request = request
         for (key, value) in WatchConnectivityManager.shared.customHeaders {
