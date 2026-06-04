@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Alarm support - Set an alarm to interrupt playback at a specific time or after a duration (thanks @DonQuinleone)
+- Repeat support - Repeat the current book, episode, or chapter during playback
+- Card preferences page - New dedicated preferences page to customize card appearance
+- Cover flow for continue section - New cover flow display for the continue section
+- Mix with other audio - New audio player preference to mix playback with other audio sources
+- Ebook reader volume navigation - New preference to navigate ebook pages using the volume buttons
 - Lock screen and player preferences - Added more preferences to customize the lock screen and player experience
 - Haptic feedback - Add haptic feedback throughout the app for improved tactile interaction
 - Watch app custom header - Add custom header to the watch app for a more refined look
@@ -18,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Playlist and collection downloads - Download all support for playlists and collections in a single action
 
 ### Changed
+- Stats page revamp - Revamped stats page with a refreshed design and improved insights
 - Book downloads - Audiobook and ebook are now fetched together in a single download action, with accurate state and progress reflecting what's on disk
 - Preferences revamp - Revamped preferences with an adjusted page color palette for a refreshed look
 - Smart rewind pause threshold - Pause threshold is now dynamic for more accurate smart rewind behavior
