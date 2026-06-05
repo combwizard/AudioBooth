@@ -4,6 +4,7 @@ import SwiftUI
 
 extension EnvironmentValues {
   @Entry var itemDisplayMode: BookCard.DisplayMode = .card
+  @Entry var coverSize: CGFloat? = nil
 }
 
 struct BookCard: View {
@@ -73,6 +74,7 @@ extension BookCard {
   struct Content: View {
     let model: BookCard.Model
     @Environment(\.itemDisplayMode) private var displayMode
+    @Environment(\.coverSize) private var coverSize
     @Environment(\.editMode) private var editMode
     @ObservedObject private var preferences = UserPreferences.shared
 
@@ -180,6 +182,7 @@ extension BookCard {
 
     private var cover: some View {
       Cover(model: model.cover)
+        .frame(height: coverSize)
         .overlay(alignment: .bottomLeading) {
           ebookIndicator
             .padding(4)

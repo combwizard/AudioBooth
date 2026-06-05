@@ -11,6 +11,8 @@ struct LibraryView: View {
   var hasMorePages: Bool = false
   var onLoadMore: (() -> Void)?
 
+  @ObservedObject private var preferences = UserPreferences.shared
+
   @ScaledMetric(relativeTo: .title) private var gridMinimum: CGFloat = 100
 
   var body: some View {
@@ -24,10 +26,18 @@ struct LibraryView: View {
           switch item {
           case .book(let model):
             BookCard(model: model)
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+              .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: preferences.cardCoverDynamicRatio ? .bottom : .top
+              )
           case .series(let model):
             SeriesCard(model: model)
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+              .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: preferences.cardCoverDynamicRatio ? .bottom : .top
+              )
           }
         }
 

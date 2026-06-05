@@ -209,11 +209,11 @@ struct HomePage: View {
           HStack(alignment: .top, spacing: 16) {
             ForEach(items, id: \.id) { book in
               BookCard(model: book)
-                .frame(height: cardWidth * 1.5)
             }
           }
           .padding(.horizontal)
         }
+        .environment(\.coverSize, cardWidth)
 
       case .continueBooks(let model):
         Text(section.title)
@@ -229,11 +229,11 @@ struct HomePage: View {
             LazyHStack(alignment: .top, spacing: 16) {
               ForEach(model.items, id: \.id) { item in
                 BookCard(model: item)
-                  .frame(height: continueSectionWidth * 1.5)
               }
             }
             .padding(.horizontal)
           }
+          .environment(\.coverSize, continueSectionWidth)
 
         case .coverFlow:
           ContinueListeningCoverFlowView(model: model)
@@ -251,11 +251,11 @@ struct HomePage: View {
           HStack(alignment: .top, spacing: 16) {
             ForEach(items, id: \.id) { book in
               BookCard(model: book)
-                .frame(height: cardWidth * 1.5)
             }
           }
           .padding(.horizontal)
         }
+        .environment(\.coverSize, cardWidth)
 
       case .series(let items):
         Text(section.title)
@@ -269,12 +269,12 @@ struct HomePage: View {
           HStack(alignment: .top, spacing: 16) {
             ForEach(items) { series in
               SeriesCard(model: series, titleFont: .footnote)
-                .frame(height: cardWidth * 1.5)
             }
           }
           .padding(.horizontal)
         }
         .environment(\.itemDisplayMode, .card)
+        .environment(\.coverSize, cardWidth)
 
       case .authors(let items):
         Text(section.title)

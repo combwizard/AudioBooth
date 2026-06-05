@@ -4,9 +4,11 @@ import SwiftUI
 struct SeriesCard: View {
   @Bindable var model: Model
   @Environment(\.itemDisplayMode) private var displayMode
+  @Environment(\.coverSize) private var coverSize
   @ObservedObject private var preferences = UserPreferences.shared
 
   @ScaledMetric(relativeTo: .title) private var rowCoverSize: CGFloat = 60
+  @State private var coverWidth: CGFloat = .infinity
 
   let titleFont: Font
 
@@ -69,6 +71,12 @@ struct SeriesCard: View {
   var cardLayout: some View {
     VStack(alignment: .leading, spacing: 6) {
       stackedCovers
+        .frame(width: coverSize, height: coverSize)
+        .onGeometryChange(for: CGFloat.self) {
+          $0.size.width
+        } action: { width in
+          coverWidth = width
+        }
 
       if !preferences.cardMinimalMode {
         Text(model.title)
@@ -76,7 +84,7 @@ struct SeriesCard: View {
           .fontWeight(.medium)
           .lineLimit(2)
           .multilineTextAlignment(.leading)
-          .frame(maxWidth: .infinity, alignment: .leading)
+          .frame(maxWidth: coverSize ?? coverWidth, alignment: .leading)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)

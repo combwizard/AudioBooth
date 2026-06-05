@@ -83,6 +83,16 @@ struct CardPreferencesView: View {
           )
         }
         .listRowBackground(theme.colors.background.card)
+
+        Toggle(isOn: $preferences.showBookSubtitle) {
+          PreferenceRow(
+            systemImage: "text.below.photo",
+            tint: .orange,
+            title: "Show Subtitle",
+            subtitle: "Display the book subtitle under the title"
+          )
+        }
+        .listRowBackground(theme.colors.background.card)
       } header: {
         Text("Layout")
       }
@@ -115,6 +125,7 @@ struct CardPreferencesView: View {
   private var isAtDefaults: Bool {
     !preferences.cardMinimalMode
       && !preferences.cardCoverDynamicRatio
+      && !preferences.showBookSubtitle
       && preferences.cardCoverCornerRadius == .medium
       && preferences.cardCoverBorderWidth == .small
   }
@@ -122,6 +133,7 @@ struct CardPreferencesView: View {
   private func reset() {
     preferences.cardMinimalMode = false
     preferences.cardCoverDynamicRatio = false
+    preferences.showBookSubtitle = false
     preferences.cardCoverCornerRadius = .medium
     preferences.cardCoverBorderWidth = .small
   }
@@ -142,8 +154,8 @@ private struct CardPreview: View {
         .padding(.horizontal)
 
       HStack(alignment: .top, spacing: 16) {
-        card(title: "Foundation", author: "Isaac Asimov", isDynamic: true)
-        card(title: "Dune", author: "Frank Herbert", isDynamic: false)
+        card(title: "Foundation", subtitle: "Foundation, Book 1", author: "Isaac Asimov", isDynamic: true)
+        card(title: "Dune", subtitle: "Dune Chronicles 1", author: "Frank Herbert", isDynamic: false)
       }
       .padding(.horizontal)
     }
@@ -152,7 +164,7 @@ private struct CardPreview: View {
     .background(theme.colors.background.card)
   }
 
-  private func card(title: String, author: String, isDynamic: Bool) -> some View {
+  private func card(title: String, subtitle: String, author: String, isDynamic: Bool) -> some View {
     VStack(alignment: .leading, spacing: 8) {
       cover(title: title, author: author, isDynamic: isDynamic)
 
@@ -163,6 +175,13 @@ private struct CardPreview: View {
             .fontWeight(.medium)
             .foregroundStyle(.primary)
             .lineLimit(1)
+
+          if preferences.showBookSubtitle {
+            Text(subtitle)
+              .font(.caption2)
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
+          }
 
           Text(author)
             .font(.caption2)
