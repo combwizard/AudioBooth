@@ -39,6 +39,7 @@ final class BookPlayerModel: BookPlayer.Model {
   private var interruptionBeganAt: Date?
   private var volumeObservation: NSKeyValueObservation?
   private var hasPlayedThisSession = false
+  private var hasRecordedCompletion = false
 
   init(_ book: Book) {
     self.item = nil
@@ -1123,16 +1124,19 @@ extension BookPlayerModel {
 
   private func recordBookCompletionIfNeeded(autoPlayNext: Bool) {
     guard
+      !hasRecordedCompletion,
       !mediaProgress.isFinished,
       chapters?.isShuffled != true,
       mediaProgress.duration > 0,
       mediaProgress.remaining <= 60
     else { return }
 
-    if chapters?.repeatMode != .off {
+    if let chapters, chapters.repeatMode != .off {
       repeatItem()
       return
     }
+
+    hasRecordedCompletion = true
 
     if let localBook = item as? LocalBook {
       Task {
