@@ -332,9 +332,12 @@ extension PlayerManager {
   private func setupRemoteCommandCenter() {
     do {
       let audioSession = AVAudioSession.sharedInstance()
-      let options: AVAudioSession.CategoryOptions = userPreferences.mixWithOtherAudio ? [.mixWithOthers] : []
-      try audioSession.setCategory(.playback, mode: .spokenAudio, policy: .longFormAudio, options: options)
-      if audioSession.isCarPlayConnected || !audioSession.secondaryAudioShouldBeSilencedHint {
+      let otherAudioPlaying = audioSession.secondaryAudioShouldBeSilencedHint
+      let mix = userPreferences.mixWithOtherAudio && otherAudioPlaying
+      let options: AVAudioSession.CategoryOptions = mix ? [.mixWithOthers] : []
+      let policy: AVAudioSession.RouteSharingPolicy = mix ? .default : .longFormAudio
+      try audioSession.setCategory(.playback, mode: .spokenAudio, policy: policy, options: options)
+      if !mix, audioSession.isCarPlayConnected || !otherAudioPlaying {
         try audioSession.setActive(true)
       }
     } catch {

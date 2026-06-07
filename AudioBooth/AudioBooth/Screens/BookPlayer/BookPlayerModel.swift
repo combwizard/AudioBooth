@@ -978,8 +978,10 @@ extension BookPlayerModel {
 extension BookPlayerModel {
   private func configureAudioSession() {
     do {
-      let options: AVAudioSession.CategoryOptions = userPreferences.mixWithOtherAudio ? [.mixWithOthers] : []
-      try audioSession.setCategory(.playback, mode: .spokenAudio, policy: .longFormAudio, options: options)
+      let mix = userPreferences.mixWithOtherAudio && audioSession.secondaryAudioShouldBeSilencedHint
+      let options: AVAudioSession.CategoryOptions = mix ? [.mixWithOthers] : []
+      let policy: AVAudioSession.RouteSharingPolicy = mix ? .default : .longFormAudio
+      try audioSession.setCategory(.playback, mode: .spokenAudio, policy: policy, options: options)
     } catch {
       AppLogger.player.error("Failed to configure audio session: \(error)")
     }
