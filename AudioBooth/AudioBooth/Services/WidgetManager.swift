@@ -60,6 +60,9 @@ final class WidgetManager {
   func clear() {
     cancellables.removeAll()
     watchConnectivity.sendPlaybackRate(nil)
+    Task { @MainActor in
+      NowPlayingLiveActivityManager.shared.end()
+    }
   }
 
   func update() {
@@ -95,6 +98,22 @@ final class WidgetManager {
       }
 
     watchConnectivity.syncProgress(id, chapterProgress: chapterProgress)
+
+    let chapterTitle = currentChapterTitle()
+    Task { @MainActor in
+      NowPlayingLiveActivityManager.shared.update(
+        playbackState: state,
+        chapterTitle: chapterTitle,
+        accentColor: UserPreferences.shared.accentColor,
+        enabled: UserPreferences.shared.nowPlayingLiveActivityEnabled
+      )
+    }
+  }
+
+  private func currentChapterTitle() -> String? {
+    guard let chapters, chapters.currentIndex < chapters.chapters.count else { return nil }
+    guard !UserPreferences.shared.showFullBookDuration else { return nil }
+    return chapters.chapters[chapters.currentIndex].title
   }
 
   private func observeProgressChanges() {

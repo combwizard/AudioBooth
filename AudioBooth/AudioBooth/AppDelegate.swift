@@ -110,6 +110,7 @@ extension AppDelegate {
           dismissalPolicy: .immediate
         )
       }
+      await NowPlayingLiveActivityManager.endAllActivities()
     }
   }
   #endif

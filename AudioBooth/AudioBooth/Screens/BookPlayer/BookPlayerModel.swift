@@ -1122,6 +1122,7 @@ extension BookPlayerModel {
     try? mediaProgress.save()
 
     isPlaying = isNowPlaying
+    ScreenSleepController.refresh()
   }
 
   private func recordBookCompletionIfNeeded(autoPlayNext: Bool) {

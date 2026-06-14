@@ -149,6 +149,7 @@ final class PlayerManager: ObservableObject, Sendable {
     }
     current = nil
     isShowingFullPlayer = false
+    ScreenSleepController.refresh()
     sharedDefaults.removeObject(forKey: "playbackState")
     watchConnectivity.sendPlaybackRate(nil)
     SessionManager.shared.clearSession()
@@ -157,10 +158,12 @@ final class PlayerManager: ObservableObject, Sendable {
 
   func showFullPlayer() {
     isShowingFullPlayer = true
+    ScreenSleepController.refresh()
   }
 
   func hideFullPlayer() {
     isShowingFullPlayer = false
+    ScreenSleepController.refresh()
   }
 
   func openLocalBookAsEbook(_ localBook: LocalBook) {

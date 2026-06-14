@@ -76,6 +76,9 @@ final class UserPreferences: ObservableObject {
   @AppStorage("lockScreenShowRemainingInTitle")
   var lockScreenShowRemainingInTitle: Bool = false
 
+  @AppStorage("nowPlayingLiveActivityEnabled")
+  var nowPlayingLiveActivityEnabled: Bool = true
+
   @AppStorage("timeRemainingAdjustsWithSpeed")
   var timeRemainingAdjustsWithSpeed: Bool = true
 

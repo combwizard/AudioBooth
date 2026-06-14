@@ -47,13 +47,17 @@ Download AudioBooth from the App Store: [https://apps.apple.com/us/app/id6753017
 git clone https://github.com/AudioBooth/AudioBooth.git
 cd AudioBooth
 ```
-2. Open the project in Xcode 26
-3. Build and run the project on your device or simulator
+2. Open `AudioBooth/AudioBooth.xcodeproj` in Xcode 26
+3. Build and run on the simulator — no extra setup required
+
+For **device builds**, create a local signing configuration. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
 
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for signing setup, code style, and branch naming.
 
 **Note:** This project is in active early development. The main branch may be rebased and force-pushed to keep the git history clean. Apologies for any inconvenience this may cause!
 

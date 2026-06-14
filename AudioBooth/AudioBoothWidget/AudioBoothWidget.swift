@@ -11,6 +11,7 @@ struct AudioBoothWidgetBundle: WidgetBundle {
     WeeklyListeningWidget()
     ListeningActivityWidget()
     SleepTimerLiveActivity()
+    NowPlayingLiveActivity()
   }
 }
 

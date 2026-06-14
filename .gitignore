@@ -15,6 +15,7 @@ build/
 
 # Local configuration
 AudioBooth/Local.xcconfig
+.cursor/
 
 # Secrets
 .netrc

@@ -595,7 +595,8 @@ extension SessionManager {
       for activity in Activity<SleepTimerActivityAttributes>.activities {
         await activity.end(nil, dismissalPolicy: .immediate)
       }
-      AppLogger.session.info("Ended all sleep timer Live Activities during session cleanup")
+      await NowPlayingLiveActivityManager.endAllActivities()
+      AppLogger.session.info("Ended all Live Activities during session cleanup")
     }
   }
   #else

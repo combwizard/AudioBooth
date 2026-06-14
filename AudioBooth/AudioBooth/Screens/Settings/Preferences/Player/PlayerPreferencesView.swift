@@ -50,7 +50,7 @@ struct PlayerPreferencesView: View {
             systemImage: "sun.max",
             tint: .yellow,
             title: "Keep Screen Awake",
-            subtitle: "Prevent auto-lock while the player is open"
+            subtitle: "Prevent auto-lock while listening or in the player"
           )
         }
         .listRowBackground(theme.colors.background.card)

@@ -1127,6 +1127,14 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Models;
 		};
+		3F5A206D2F6E682100CFD89E /* API */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = API;
+		};
+		3F5A206E2F6E682100CFD89F /* API */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = API;
+		};
 		3F5C74562EDE598700976431 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3F5C74552EDE598700976431 /* XCRemoteSwiftPackageReference "swift-log" */;
@@ -1157,14 +1165,6 @@
 			productName = PulseProxy;
 		};
 		3FBEA0822E8CE7D600976BA0 /* API */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = API;
-		};
-		3F5A206D2F6E682100CFD89E /* API */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = API;
-		};
-		3F5A206E2F6E682100CFD89F /* API */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = API;
 		};

@@ -40,11 +40,6 @@ struct BookPlayer: View {
         }
       }
       .orientationLock(supportedOrientations)
-      .onAppear { UIApplication.shared.isIdleTimerDisabled = preferences.keepScreenAwakeInPlayer }
-      .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
-      .onChange(of: preferences.keepScreenAwakeInPlayer) { _, newValue in
-        UIApplication.shared.isIdleTimerDisabled = newValue
-      }
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {
           Button(

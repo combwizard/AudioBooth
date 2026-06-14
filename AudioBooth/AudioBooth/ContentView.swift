@@ -83,9 +83,20 @@ struct ContentView: View {
       }
       .handleDeepLinks()
       .onChange(of: scenePhase) { _, newPhase in
-        if newPhase == .active, preferences.openPlayerOnLaunch, playerManager.current != nil, !isModalPresented {
-          playerManager.showFullPlayer()
+        if newPhase == .active {
+          ScreenSleepController.refresh()
+          if preferences.openPlayerOnLaunch, playerManager.current != nil, !isModalPresented {
+            playerManager.showFullPlayer()
+          }
+        } else {
+          UIApplication.shared.isIdleTimerDisabled = false
         }
+      }
+      .onChange(of: preferences.keepScreenAwakeInPlayer) { _, _ in
+        ScreenSleepController.refresh()
+      }
+      .onChange(of: playerManager.isShowingFullPlayer) { _, _ in
+        ScreenSleepController.refresh()
       }
   }
 

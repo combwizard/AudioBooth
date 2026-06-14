@@ -18,6 +18,7 @@ extension UserPreferences {
     "lockScreenNextPreviousUsesChapters",
     "lockScreenAllowPlaybackPositionChange",
     "lockScreenShowRemainingInTitle",
+    "nowPlayingLiveActivityEnabled",
     "timeRemainingAdjustsWithSpeed",
     "chapterProgressionAdjustsWithSpeed",
     "showFullBookDuration",

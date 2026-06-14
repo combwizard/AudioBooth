@@ -54,6 +54,23 @@ struct LockScreenPreferencesView: View {
       }
 
       Section {
+        Toggle(isOn: $preferences.nowPlayingLiveActivityEnabled) {
+          PreferenceRow(
+            systemImage: "platter.filled.top.iphone",
+            tint: .purple,
+            title: "Now Playing Live Activity",
+            subtitle: "Show playback on the Lock Screen and Dynamic Island"
+          )
+        }
+        .listRowBackground(theme.colors.background.card)
+        .onChange(of: preferences.nowPlayingLiveActivityEnabled) { _, enabled in
+          if !enabled {
+            Task { @MainActor in
+              NowPlayingLiveActivityManager.shared.end()
+            }
+          }
+        }
+
         Toggle(isOn: $preferences.lockScreenAllowPlaybackPositionChange) {
           PreferenceRow(
             systemImage: "slider.horizontal.below.rectangle",
