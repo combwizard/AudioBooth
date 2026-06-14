@@ -1,3 +1,4 @@
+import API
 import AppIntents
 import Models
 import PlayerIntents
@@ -7,7 +8,7 @@ import WidgetKit
 struct SmallWidgetView: View {
   let entry: AudioBoothWidgetEntry
   let playbackState: PlaybackState
-  @AppStorage("timeRemainingAdjustsWithSpeed", store: UserDefaults(suiteName: "group.me.jgrenier.audioBS"))
+  @AppStorage("timeRemainingAdjustsWithSpeed", store: UserDefaults.appGroup)
   var timeRemainingAdjustsWithSpeed: Bool = true
 
   var body: some View {

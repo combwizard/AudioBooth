@@ -6,7 +6,7 @@ final class NetworkMonitor {
   static let shared = NetworkMonitor()
 
   private let monitor = NWPathMonitor()
-  private let queue = DispatchQueue(label: "me.jgrenier.AudioBS.NetworkMonitor")
+  private let queue = DispatchQueue(label: "\(AppIdentifiers.orgIdentifier).AudioBS.NetworkMonitor")
 
   private(set) var isConnected = true
   private(set) var interfaceType: NWInterface.InterfaceType?

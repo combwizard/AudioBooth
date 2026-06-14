@@ -14,7 +14,7 @@ import ActivityKit
 final class SessionManager {
   static let shared = SessionManager()
 
-  private let taskIdentifier = "me.jgrenier.AudioBS.close-session"
+  private let taskIdentifier = AppIdentifiers.closeSessionTaskIdentifier
   private let sessionIDKey = "activeSessionID"
   private let retryCountKey = "sessionCloseRetryCount"
   private let inactivityTimeout: TimeInterval = 10 * 60

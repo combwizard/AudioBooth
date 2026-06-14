@@ -1,14 +1,20 @@
 .DS_Store
-/.build
-/Packages
-/*.xcodeproj
-xcuserdata/
-DerivedData/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
 .swiftpm/config/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
-.netrc
-.swiftpm
-Package.resolved
-.build
-Debug
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcresult
+
+# Local configuration
 AudioBooth/Local.xcconfig
+
+# Secrets
+.netrc

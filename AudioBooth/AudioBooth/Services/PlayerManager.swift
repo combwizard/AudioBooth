@@ -33,7 +33,7 @@ final class PlayerManager: ObservableObject, Sendable {
 
   private static let currentIDKey = "currentBookID"
   private static let queueKey = "playerQueue"
-  private let sharedDefaults = UserDefaults(suiteName: "group.me.jgrenier.audioBS")
+  private let sharedDefaults = UserDefaults.appGroup
 
   private var cancellables = Set<AnyCancellable>()
 
@@ -149,7 +149,7 @@ final class PlayerManager: ObservableObject, Sendable {
     }
     current = nil
     isShowingFullPlayer = false
-    sharedDefaults?.removeObject(forKey: "playbackState")
+    sharedDefaults.removeObject(forKey: "playbackState")
     watchConnectivity.sendPlaybackRate(nil)
     SessionManager.shared.clearSession()
     WidgetCenter.shared.reloadAllTimelines()

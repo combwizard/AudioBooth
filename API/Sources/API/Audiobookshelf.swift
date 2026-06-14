@@ -34,7 +34,7 @@ public final class Audiobookshelf: @unchecked Sendable {
       configuration.httpAdditionalHeaders = authentication.server?.customHeaders
       $0.dataLoader = DataLoader(configuration: configuration)
 
-      $0.dataCache = try? DataCache(name: "me.jgrenier.audioBS.images")
+      $0.dataCache = try? DataCache(name: "\(AppIdentifiers.orgIdentifier).audioBS.images")
     }
   }
 

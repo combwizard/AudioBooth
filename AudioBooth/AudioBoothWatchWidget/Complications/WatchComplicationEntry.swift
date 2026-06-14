@@ -1,3 +1,4 @@
+import API
 import Foundation
 import WidgetKit
 
@@ -33,7 +34,7 @@ struct WatchComplicationState: Codable {
 }
 
 enum WatchComplicationStorage {
-  private static let suiteName = "group.me.jgrenier.audioBS"
+  private static let suiteName = AppIdentifiers.appGroup
   private static let stateKey = "watchComplicationState"
 
   static var sharedDefaults: UserDefaults? {

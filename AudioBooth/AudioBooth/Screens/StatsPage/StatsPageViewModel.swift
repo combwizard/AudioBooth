@@ -74,7 +74,7 @@ final class StatsPageViewModel: StatsPageView.Model {
     dailyGoalMinutes = minutes
     preferences.dailyGoalMinutes = minutes
 
-    if let sharedDefaults = UserDefaults(suiteName: "group.me.jgrenier.audioBS"),
+    if let sharedDefaults = UserDefaults(suiteName: AppIdentifiers.appGroup),
       let data = sharedDefaults.data(forKey: "listeningStats"),
       var stats = try? JSONDecoder().decode(WidgetStatsData.self, from: data)
     {

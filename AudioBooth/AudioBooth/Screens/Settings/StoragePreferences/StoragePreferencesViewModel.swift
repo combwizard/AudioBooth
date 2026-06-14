@@ -65,7 +65,7 @@ final class StoragePreferencesViewModel: StoragePreferencesView.Model {
   override func onRemoveDownload(bookID: String, serverID: String) {
     guard
       let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
+        forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup
       )
     else { return }
 
@@ -121,7 +121,7 @@ final class StoragePreferencesViewModel: StoragePreferencesView.Model {
   ) {
     guard
       let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
+        forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup
       )
     else {
       return (0, 0, 0, 0)
@@ -171,7 +171,7 @@ final class StoragePreferencesViewModel: StoragePreferencesView.Model {
     let servers = Audiobookshelf.shared.authentication.servers
     guard
       let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
+        forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup
       )
     else { return [] }
 

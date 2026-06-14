@@ -57,7 +57,7 @@ struct AudioBoothApp: App {
   }
 
   private func syncAccentColorToWidget(_ color: Color?) {
-    let sharedDefaults = UserDefaults(suiteName: "group.me.jgrenier.audioBS")
+    let sharedDefaults = UserDefaults(suiteName: AppIdentifiers.appGroup)
     sharedDefaults?.set(color?.rawValue, forKey: "accentColor")
     WidgetCenter.shared.reloadAllTimelines()
   }

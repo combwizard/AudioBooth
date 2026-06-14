@@ -1,3 +1,4 @@
+import API
 import Foundation
 import Logging
 import SwiftData
@@ -121,7 +122,7 @@ public final class ModelContextProvider {
   private func databaseURL(for serverID: String) -> URL {
     let containerURL =
       FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
+        forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup
       )
       ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
 

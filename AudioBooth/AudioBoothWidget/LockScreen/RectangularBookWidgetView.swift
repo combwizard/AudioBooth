@@ -1,3 +1,4 @@
+import API
 import AppIntents
 import Models
 import PlayerIntents
@@ -13,7 +14,7 @@ struct RectangularBookWidgetView: View {
   }
   let action: Action
 
-  @AppStorage("timeRemainingAdjustsWithSpeed", store: UserDefaults(suiteName: "group.me.jgrenier.audioBS"))
+  @AppStorage("timeRemainingAdjustsWithSpeed", store: UserDefaults.appGroup)
   var timeRemainingAdjustsWithSpeed: Bool = true
 
   var body: some View {

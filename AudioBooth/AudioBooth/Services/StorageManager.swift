@@ -13,7 +13,7 @@ final class StorageManager {
   func getDownloadedContentSize() async -> Int64 {
     guard
       let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
+        forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup
       )
     else {
       return 0

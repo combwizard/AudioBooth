@@ -1,3 +1,4 @@
+import API
 import Models
 import SwiftUI
 
@@ -5,7 +6,7 @@ final class SpeedPickerSheetViewModel: FloatPickerSheet.Model {
   private static let defaultPresets: [Double] = [0.7, 1.0, 1.2, 1.5, 1.7, 2.0]
   private static let presetsKey = "speedPresets"
 
-  private let sharedDefaults = UserDefaults(suiteName: "group.me.jgrenier.audioBS")
+  private let sharedDefaults = UserDefaults.appGroup
   private let mediaProgress: MediaProgress?
 
   let player: AudioPlayer
@@ -21,7 +22,7 @@ final class SpeedPickerSheetViewModel: FloatPickerSheet.Model {
       speed = fallback > 0 ? Float(fallback) : 1.0
     }
 
-    sharedDefaults?.set(speed, forKey: "playbackSpeed")
+    sharedDefaults.set(speed, forKey: "playbackSpeed")
     player.rate = speed
 
     let savedPresets = UserDefaults.standard.array(forKey: Self.presetsKey) as? [Double]
@@ -54,7 +55,7 @@ final class SpeedPickerSheetViewModel: FloatPickerSheet.Model {
     let floatValue = Float(rounded)
 
     mediaProgress?.playbackSpeed = rounded
-    sharedDefaults?.set(floatValue, forKey: "playbackSpeed")
+    sharedDefaults.set(floatValue, forKey: "playbackSpeed")
 
     player.rate = floatValue
   }

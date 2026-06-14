@@ -5,7 +5,7 @@ import SimpleKeychain
 
 public final class AuthenticationService: ObservableObject {
   private let audiobookshelf: Audiobookshelf
-  private let keychain = SimpleKeychain(service: "me.jgrenier.AudioBS")
+  private let keychain = SimpleKeychain(service: AppIdentifiers.keychainService)
 
   enum Keys {
     static let connections = "audiobookshelf_server_connections"

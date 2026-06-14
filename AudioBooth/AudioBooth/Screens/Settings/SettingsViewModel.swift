@@ -15,7 +15,6 @@ final class SettingsViewModel: SettingsView.Model {
     UserDefaults.standard.set(true, forKey: "pulse-disable-settings-prompts")
 
     super.init(
-      tipJar: TipJarViewModel(),
       playbackSessionList: PlaybackSessionListViewModel(),
       storagePreferences: StoragePreferencesViewModel()
     )
@@ -28,7 +27,7 @@ final class SettingsViewModel: SettingsView.Model {
       DownloadManager.shared.deleteAllServerData()
       PlayerManager.shared.clearCurrent()
 
-      let keychain = SimpleKeychain(service: "me.jgrenier.AudioBS")
+      let keychain = SimpleKeychain(service: AppIdentifiers.keychainService)
       try? keychain.deleteAll()
 
       audiobookshelf.logoutAll()

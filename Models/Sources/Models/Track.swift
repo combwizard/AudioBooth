@@ -104,7 +104,7 @@ public final class Track {
 
     guard
       let appGroupURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.me.jgrenier.audioBS"
+        forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup
       )
     else {
       return nil

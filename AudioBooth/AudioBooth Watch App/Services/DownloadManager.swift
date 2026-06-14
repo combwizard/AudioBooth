@@ -1,3 +1,4 @@
+import API
 import Combine
 import Foundation
 import OSLog
@@ -14,7 +15,7 @@ final class DownloadManager: NSObject, ObservableObject {
   private let operationQueue: OperationQueue = {
     let queue = OperationQueue()
     queue.maxConcurrentOperationCount = 1
-    queue.name = "me.jgrenier.AudioBS.watch.downloadQueue"
+    queue.name = "\(AppIdentifiers.orgIdentifier).AudioBS.watch.downloadQueue"
     return queue
   }()
 
@@ -93,8 +94,8 @@ final class DownloadManager: NSObject, ObservableObject {
   }
 
   func reconnectBackgroundSession(withIdentifier identifier: String) {
-    guard identifier.hasPrefix("me.jgrenier.AudioBS.watch.download.") else { return }
-    let bookID = String(identifier.dropFirst("me.jgrenier.AudioBS.watch.download.".count))
+    guard identifier.hasPrefix(AppIdentifiers.watchDownloadTaskPrefix) else { return }
+    let bookID = String(identifier.dropFirst(AppIdentifiers.watchDownloadTaskPrefix.count))
 
     guard activeOperations[bookID] == nil else {
       AppLogger.download.debug("Session already active for book: \(bookID)")
@@ -223,7 +224,7 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
 
   private lazy var downloadSession: URLSession = {
     let config = URLSessionConfiguration.background(
-      withIdentifier: "me.jgrenier.AudioBS.watch.download.\(bookID)"
+      withIdentifier: "\(AppIdentifiers.watchDownloadTaskPrefix)\(bookID)"
     )
     config.isDiscretionary = false
     config.sessionSendsLaunchEvents = true

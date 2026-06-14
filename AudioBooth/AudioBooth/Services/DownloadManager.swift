@@ -10,11 +10,11 @@ import SwiftData
 final class DownloadManager: NSObject, ObservableObject {
   static let shared = DownloadManager()
 
-  static let appGroupIdentifier = "group.me.jgrenier.audioBS"
+  static var appGroupIdentifier: String { AppIdentifiers.appGroup }
 
   static let appGroupContainer: URL = {
-    guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) else {
-      fatalError("App group container '\(appGroupIdentifier)' not configured")
+    guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup) else {
+      fatalError("App group container '\(AppIdentifiers.appGroup)' not configured")
     }
     return url
   }()
@@ -61,7 +61,7 @@ final class DownloadManager: NSObject, ObservableObject {
   private let operationQueue: OperationQueue = {
     let queue = OperationQueue()
     queue.maxConcurrentOperationCount = 1
-    queue.name = "me.jgrenier.AudioBS.downloadQueue"
+    queue.name = "\(AppIdentifiers.orgIdentifier).AudioBS.downloadQueue"
     return queue
   }()
 
@@ -271,7 +271,7 @@ private final class DownloadOperation: Operation, @unchecked Sendable {
 
   private lazy var downloadSession: URLSession = {
     let config = URLSessionConfiguration.background(
-      withIdentifier: "me.jgrenier.AudioBS.download.\(bookID)"
+      withIdentifier: "\(AppIdentifiers.downloadTaskPrefix)\(bookID)"
     )
     config.timeoutIntervalForRequest = 300
     config.sessionSendsLaunchEvents = true

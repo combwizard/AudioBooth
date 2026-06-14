@@ -5,6 +5,11 @@
 // To find your Team ID, open Xcode → Settings → Accounts → select your Apple ID → look at the Team list.
 
 DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
-ORG_IDENTIFIER = com.YOUR_ORG_HERE
+ORG_IDENTIFIER = me.yourname
+CONTRIBUTOR_ENTITLEMENTS_SUFFIX = Contributor
 
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) CONTRIBUTOR_BUILD
+
+// Optional: override bundle ID for App Store / production device builds
+// PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*] = your.production.bundle.id
+// PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = your.production.bundle.id

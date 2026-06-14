@@ -1,3 +1,4 @@
+import API
 import Nuke
 import SwiftUI
 import WatchKit
@@ -50,7 +51,7 @@ struct AudioBoothWatch: App {
       config.urlCache = nil
 
       $0.dataLoader = CustomHeaderDataLoader(inner: DataLoader(configuration: config))
-      $0.dataCache = try? DataCache(name: "me.jgrenier.audioBS.watch.images")
+      $0.dataCache = try? DataCache(name: "\(AppIdentifiers.orgIdentifier).audioBS.watch.images")
     }
   }
 }

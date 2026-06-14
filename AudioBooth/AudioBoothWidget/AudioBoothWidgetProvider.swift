@@ -1,3 +1,4 @@
+import API
 import Foundation
 import Models
 import Nuke
@@ -50,7 +51,7 @@ struct AudioBoothWidgetProvider: TimelineProvider {
 
   @MainActor
   private func getCurrentBookEntry() async -> AudioBoothWidgetEntry {
-    let sharedDefaults = UserDefaults(suiteName: "group.me.jgrenier.audioBS")
+    let sharedDefaults = UserDefaults(suiteName: AppIdentifiers.appGroup)
 
     guard let data = sharedDefaults?.data(forKey: "playbackState"),
       let playbackState = try? JSONDecoder().decode(PlaybackState.self, from: data)
@@ -93,7 +94,7 @@ struct AudioBoothWidgetProvider: TimelineProvider {
 
   @MainActor
   private func fetchRecentBooks() async -> ([BookListEntry], [String: UIImage]) {
-    let sharedDefaults = UserDefaults(suiteName: "group.me.jgrenier.audioBS")
+    let sharedDefaults = UserDefaults(suiteName: AppIdentifiers.appGroup)
 
     guard let data = sharedDefaults?.data(forKey: "recentBooks"),
       let books = try? JSONDecoder().decode([BookListEntry].self, from: data)
